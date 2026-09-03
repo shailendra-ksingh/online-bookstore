@@ -17,11 +17,12 @@ export function CartProvider({ children }) {
     const [error, setError] = useState("");
 
 
-    const updateCartState = (cart) => {
+    const updateCartState = useCallback((cart) => {
 
         setCartItems(cart.items || []);
         setCartTotal(Number(cart.total || 0));
-    };
+
+    }, []);
 
 
     const loadCart = useCallback(async () => {
@@ -45,17 +46,48 @@ export function CartProvider({ children }) {
             setLoading(false);
         }
 
-    }, []);
+    }, [updateCartState]);
 
 
+    // Load cart when the provider is initialized
     useEffect(() => {
 
-        void loadCart();
+        let isMounted = true;
 
-    }, [loadCart]);
+        const initializeCart = async () => {
+
+            try {
+
+                const cart = await getCart();
+
+                if (isMounted) {
+                    updateCartState(cart);
+                }
+
+            } catch (error) {
+
+                console.error("Failed to load cart", error);
+
+                if (isMounted) {
+                    setError("Unable to load cart.");
+                }
+            }
+        };
+
+        void initializeCart();
+
+        return () => {
+            isMounted = false;
+        };
+
+    }, [updateCartState]);
 
 
     const addToCart = async (book) => {
+
+        if (loading) {
+            return;
+        }
 
         setLoading(true);
         setError("");

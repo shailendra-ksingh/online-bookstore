@@ -14,40 +14,22 @@ import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
 
 
-function Application() {
+function BookstoreApplication() {
 
-    const { isAuthenticated, logout } = useAuth();
+    const { logout } = useAuth();
     const { getCartItemCount } = useCart();
 
-    const [showRegister, setShowRegister] = useState(false);
     const [showCart, setShowCart] = useState(false);
     const [showCheckout, setShowCheckout] = useState(false);
 
 
-    // User not logged in
-    if (!isAuthenticated) {
+    const handleLogout = () => {
 
-        if (showRegister) {
-            return (
-                <RegisterPage
-                    onRegistrationComplete={() =>
-                        setShowRegister(false)
-                    }
-                />
-            );
-        }
+        setShowCart(false);
+        setShowCheckout(false);
 
-        return (
-            <LoginPage
-                onLoginSuccess={() => {
-                    setShowRegister(false);
-                }}
-                onRegisterClick={() => {
-                    setShowRegister(true);
-                }}
-            />
-        );
-    }
+        logout();
+    };
 
 
     // Checkout page
@@ -62,7 +44,7 @@ function Application() {
 
                     <button
                         type="button"
-                        onClick={logout}
+                        onClick={handleLogout}
                     >
                         Logout
                     </button>
@@ -106,7 +88,7 @@ function Application() {
 
                     <button
                         type="button"
-                        onClick={logout}
+                        onClick={handleLogout}
                     >
                         Logout
                     </button>
@@ -153,7 +135,7 @@ function Application() {
 
                     <button
                         type="button"
-                        onClick={logout}
+                        onClick={handleLogout}
                     >
                         Logout
                     </button>
@@ -174,16 +156,63 @@ function Application() {
 }
 
 
+function Application() {
+
+    const { isAuthenticated } = useAuth();
+
+    const [showRegister, setShowRegister] = useState(false);
+
+
+    // User not logged in
+    if (!isAuthenticated) {
+
+        if (showRegister) {
+
+            return (
+                <RegisterPage
+                    onRegistrationComplete={() =>
+                        setShowRegister(false)
+                    }
+                />
+            );
+        }
+
+
+        return (
+            <LoginPage
+
+                onLoginSuccess={() => {
+                    setShowRegister(false);
+                }}
+
+                onRegisterClick={() => {
+                    setShowRegister(true);
+                }}
+
+            />
+        );
+    }
+
+
+    // CartProvider is mounted only after authentication.
+    // This prevents cart API calls before login.
+    // On logout, CartProvider unmounts and cart state is reset.
+    return (
+        <CartProvider>
+
+            <BookstoreApplication />
+
+        </CartProvider>
+    );
+}
+
+
 function App() {
 
     return (
         <AuthProvider>
 
-            <CartProvider>
-
-                <Application />
-
-            </CartProvider>
+            <Application />
 
         </AuthProvider>
     );

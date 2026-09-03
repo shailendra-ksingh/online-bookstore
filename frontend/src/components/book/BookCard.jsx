@@ -1,12 +1,23 @@
 import { useCart } from "../../context/useCart";
 
+
 function BookCard({ book }) {
 
-    const { addToCart } = useCart();
+    const {
+        addToCart,
+        loading
+    } = useCart();
+
 
     const handleAddToCart = async () => {
+
+        if (loading) {
+            return;
+        }
+
         await addToCart(book);
     };
+
 
     return (
         <div className="book-card">
@@ -18,18 +29,22 @@ function BookCard({ book }) {
             </p>
 
             <p className="book-price">
-                ₹{Number(book.price || 0).toFixed(2)}
+                {Number(book.price || 0).toFixed(2)}
             </p>
 
             <button
                 type="button"
                 onClick={handleAddToCart}
+                disabled={loading}
             >
-                Add to Cart
+                {loading
+                    ? "Adding..."
+                    : "Add to Cart"}
             </button>
 
         </div>
     );
 }
+
 
 export default BookCard;

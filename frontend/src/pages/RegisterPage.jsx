@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { registerUser } from "../api/authApi";
 
+
 function RegisterPage({ onRegistrationComplete }) {
 
     const [form, setForm] = useState({
@@ -15,16 +16,46 @@ function RegisterPage({ onRegistrationComplete }) {
 
 
     const handleChange = (event) => {
+
         const { name, value } = event.target;
 
-        setForm((previous) => ({
-            ...previous,
+        setForm((previousForm) => ({
+            ...previousForm,
             [name]: value
         }));
     };
 
 
+    const getErrorMessage = (error) => {
+
+        const errorData = error.response?.data;
+
+        if (typeof errorData === "string") {
+            return errorData;
+        }
+
+        if (errorData?.message) {
+            return errorData.message;
+        }
+
+        if (errorData?.name) {
+            return errorData.name;
+        }
+
+        if (errorData?.email) {
+            return errorData.email;
+        }
+
+        if (errorData?.password) {
+            return errorData.password;
+        }
+
+        return "Unable to create account. Please try again.";
+    };
+
+
     const handleSubmit = async (event) => {
+
         event.preventDefault();
 
         setError("");
@@ -32,7 +63,12 @@ function RegisterPage({ onRegistrationComplete }) {
         setLoading(true);
 
         try {
-            await registerUser(form);
+
+            await registerUser({
+                name: form.name.trim(),
+                email: form.email.trim(),
+                password: form.password
+            });
 
             setSuccess(
                 "Registration successful. Please login."
@@ -46,14 +82,10 @@ function RegisterPage({ onRegistrationComplete }) {
 
         } catch (error) {
 
-            const message =
-                error.response?.data?.password ||
-                error.response?.data?.message ||
-                "Registration failed";
-
-            setError(message);
+            setError(getErrorMessage(error));
 
         } finally {
+
             setLoading(false);
         }
     };
@@ -67,6 +99,7 @@ function RegisterPage({ onRegistrationComplete }) {
                 <div className="auth-card">
 
                     <h1>Create Account</h1>
+
 
                     {success ? (
 
@@ -91,13 +124,17 @@ function RegisterPage({ onRegistrationComplete }) {
 
                             <div className="form-group">
 
-                                <label>Name</label>
+                                <label htmlFor="name">
+                                    Name
+                                </label>
 
                                 <input
+                                    id="name"
                                     type="text"
                                     name="name"
                                     value={form.name}
                                     onChange={handleChange}
+                                    autoComplete="name"
                                     required
                                 />
 
@@ -106,13 +143,17 @@ function RegisterPage({ onRegistrationComplete }) {
 
                             <div className="form-group">
 
-                                <label>Email</label>
+                                <label htmlFor="email">
+                                    Email
+                                </label>
 
                                 <input
+                                    id="email"
                                     type="email"
                                     name="email"
                                     value={form.email}
                                     onChange={handleChange}
+                                    autoComplete="email"
                                     required
                                 />
 
@@ -121,14 +162,18 @@ function RegisterPage({ onRegistrationComplete }) {
 
                             <div className="form-group">
 
-                                <label>Password</label>
+                                <label htmlFor="password">
+                                    Password
+                                </label>
 
                                 <input
+                                    id="password"
                                     type="password"
                                     name="password"
                                     value={form.password}
                                     onChange={handleChange}
-                                    minLength="6"
+                                    autoComplete="new-password"
+                                    minLength={6}
                                     required
                                 />
 
@@ -136,7 +181,10 @@ function RegisterPage({ onRegistrationComplete }) {
 
 
                             {error && (
-                                <p className="error-message">
+                                <p
+                                    className="error-message"
+                                    role="alert"
+                                >
                                     {error}
                                 </p>
                             )}
@@ -161,5 +209,6 @@ function RegisterPage({ onRegistrationComplete }) {
         </div>
     );
 }
+
 
 export default RegisterPage;

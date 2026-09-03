@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useAuth } from "../context/useAuth";
 
+
 function LoginPage({ onLoginSuccess, onRegisterClick }) {
 
     const { login } = useAuth();
@@ -10,7 +11,9 @@ function LoginPage({ onLoginSuccess, onRegisterClick }) {
     const [error, setError] = useState("");
     const [loading, setLoading] = useState(false);
 
+
     const handleSubmit = async (event) => {
+
         event.preventDefault();
 
         setError("");
@@ -19,7 +22,7 @@ function LoginPage({ onLoginSuccess, onRegisterClick }) {
         try {
 
             await login({
-                email,
+                email: email.trim(),
                 password
             });
 
@@ -29,16 +32,16 @@ function LoginPage({ onLoginSuccess, onRegisterClick }) {
 
             const message =
                 error.response?.data?.message ||
-                "Login failed";
+                "Unable to login. Please check your credentials.";
 
             setError(message);
 
         } finally {
 
             setLoading(false);
-
         }
     };
+
 
     return (
         <div className="auth-page">
@@ -53,48 +56,65 @@ function LoginPage({ onLoginSuccess, onRegisterClick }) {
 
                         <div className="form-group">
 
-                            <label>Email</label>
+                            <label htmlFor="email">
+                                Email
+                            </label>
 
                             <input
+                                id="email"
                                 type="email"
                                 value={email}
                                 onChange={(event) =>
                                     setEmail(event.target.value)
                                 }
+                                autoComplete="email"
                                 required
                             />
 
                         </div>
 
+
                         <div className="form-group">
 
-                            <label>Password</label>
+                            <label htmlFor="password">
+                                Password
+                            </label>
 
                             <input
+                                id="password"
                                 type="password"
                                 value={password}
                                 onChange={(event) =>
                                     setPassword(event.target.value)
                                 }
+                                autoComplete="current-password"
                                 required
                             />
 
                         </div>
 
+
                         {error && (
-                            <p className="error-message">
+                            <p
+                                className="error-message"
+                                role="alert"
+                            >
                                 {error}
                             </p>
                         )}
+
 
                         <button
                             type="submit"
                             disabled={loading}
                         >
-                            {loading ? "Logging in..." : "Login"}
+                            {loading
+                                ? "Logging in..."
+                                : "Login"}
                         </button>
 
                     </form>
+
 
                     <div className="auth-footer">
 
@@ -104,6 +124,7 @@ function LoginPage({ onLoginSuccess, onRegisterClick }) {
                             type="button"
                             className="secondary-button"
                             onClick={onRegisterClick}
+                            disabled={loading}
                         >
                             Create Account
                         </button>
@@ -117,5 +138,6 @@ function LoginPage({ onLoginSuccess, onRegisterClick }) {
         </div>
     );
 }
+
 
 export default LoginPage;

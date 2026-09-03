@@ -14,6 +14,24 @@ function CartPage({ onContinueShopping, onCheckout }) {
     } = useCart();
 
 
+    if (loading && cartItems.length === 0) {
+
+        return (
+            <div className="cart-page">
+
+                <div className="cart-container">
+
+                    <h1>Shopping Cart</h1>
+
+                    <p>Loading cart...</p>
+
+                </div>
+
+            </div>
+        );
+    }
+
+
     return (
         <div className="cart-page">
 
@@ -23,17 +41,21 @@ function CartPage({ onContinueShopping, onCheckout }) {
 
 
                 {error && (
-                    <p className="error-message">
+                    <p
+                        className="error-message"
+                        role="alert"
+                    >
                         {error}
                     </p>
                 )}
 
 
-                {loading && cartItems.length === 0 ? (
+                {loading && cartItems.length > 0 && (
+                    <p>Updating cart...</p>
+                )}
 
-                    <p>Loading cart...</p>
 
-                ) : cartItems.length === 0 ? (
+                {cartItems.length === 0 ? (
 
                     <div className="empty-cart">
 
@@ -64,7 +86,7 @@ function CartPage({ onContinueShopping, onCheckout }) {
 
 
                                 <p>
-                                    Price: ₹
+                                    Price: 
                                     {Number(item.price).toFixed(2)}
                                 </p>
 
@@ -73,6 +95,7 @@ function CartPage({ onContinueShopping, onCheckout }) {
 
                                     <button
                                         type="button"
+                                        aria-label={`Decrease quantity of ${item.title}`}
                                         onClick={() =>
                                             decreaseQuantity(item.bookId)
                                         }
@@ -92,6 +115,7 @@ function CartPage({ onContinueShopping, onCheckout }) {
 
                                     <button
                                         type="button"
+                                        aria-label={`Increase quantity of ${item.title}`}
                                         onClick={() =>
                                             increaseQuantity(item.bookId)
                                         }
@@ -104,7 +128,7 @@ function CartPage({ onContinueShopping, onCheckout }) {
 
 
                                 <p>
-                                    Item Total: ₹
+                                    Item Total: 
                                     {Number(item.itemTotal).toFixed(2)}
                                 </p>
 
@@ -128,7 +152,7 @@ function CartPage({ onContinueShopping, onCheckout }) {
                         <div className="cart-summary">
 
                             <h2>
-                                Total: ₹
+                                Total: 
                                 {Number(cartTotal).toFixed(2)}
                             </h2>
 

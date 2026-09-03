@@ -33,7 +33,19 @@ function CheckoutPage({ onBackToCart, onOrderPlaced }) {
 
             // Refresh frontend cart because backend clears
             // the cart after successful order creation.
-            await loadCart();
+            try {
+
+                await loadCart();
+
+            } catch (cartError) {
+
+                // Order was successful, so cart refresh failure
+                // should not be treated as order failure.
+                console.error(
+                    "Order placed successfully, but cart refresh failed",
+                    cartError
+                );
+            }
 
             onOrderPlaced(order);
 
@@ -92,6 +104,7 @@ function CheckoutPage({ onBackToCart, onOrderPlaced }) {
                         <button
                             type="button"
                             onClick={onBackToCart}
+                            disabled={isPlacingOrder}
                         >
                             Back to Cart
                         </button>
@@ -115,7 +128,7 @@ function CheckoutPage({ onBackToCart, onOrderPlaced }) {
 
 
                                 <p>
-                                    Price: ₹
+                                    Price: 
                                     {Number(item.price).toFixed(2)}
                                 </p>
 
@@ -126,7 +139,7 @@ function CheckoutPage({ onBackToCart, onOrderPlaced }) {
 
 
                                 <p>
-                                    Item Total: ₹
+                                    Item Total: 
                                     {Number(item.itemTotal).toFixed(2)}
                                 </p>
 
@@ -138,7 +151,7 @@ function CheckoutPage({ onBackToCart, onOrderPlaced }) {
                         <div className="checkout-summary">
 
                             <h2>
-                                Total: ₹
+                                Total:
                                 {Number(cartTotal).toFixed(2)}
                             </h2>
 
@@ -147,6 +160,7 @@ function CheckoutPage({ onBackToCart, onOrderPlaced }) {
                                 type="button"
                                 onClick={onBackToCart}
                                 disabled={isPlacingOrder}
+                                style={{ marginRight: "12px" }}
                             >
                                 Back to Cart
                             </button>

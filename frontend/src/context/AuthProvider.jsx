@@ -2,24 +2,37 @@ import { useState } from "react";
 import { loginUser } from "../api/authApi";
 import { AuthContext } from "./AuthContext";
 
-export function AuthProvider({ children }) {
 
-    const [user, setUser] = useState(() => {
+const getStoredUser = () => {
+
+    try {
 
         const savedUser = localStorage.getItem("user");
 
         return savedUser ? JSON.parse(savedUser) : null;
-    });
+
+    } catch (error) {
+
+        console.error("Failed to read stored user", error);
+
+        localStorage.removeItem("user");
+
+        return null;
+    }
+};
+
+
+export function AuthProvider({ children }) {
+
+    const [user, setUser] = useState(getStoredUser);
 
 
     const login = async (credentials) => {
 
         const loggedInUser = await loginUser(credentials);
 
-        // Save in React state
         setUser(loggedInUser);
 
-        // Save in browser storage
         localStorage.setItem(
             "user",
             JSON.stringify(loggedInUser)
@@ -31,10 +44,8 @@ export function AuthProvider({ children }) {
 
     const logout = () => {
 
-        // Clear React state
         setUser(null);
 
-        // Clear browser storage
         localStorage.removeItem("user");
     };
 
