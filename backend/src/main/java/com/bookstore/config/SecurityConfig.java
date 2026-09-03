@@ -55,6 +55,7 @@ public class SecurityConfig {
     @Bean
     public PasswordEncoder passwordEncoder() {
         // BCrypt hashes passwords before they are stored in the database.
+        // APIs are public for this simplified assignment because
         return new BCryptPasswordEncoder();
     }
 

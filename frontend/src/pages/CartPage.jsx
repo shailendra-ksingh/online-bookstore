@@ -1,14 +1,18 @@
 import { useCart } from "../context/useCart";
 
+
 function CartPage({ onContinueShopping, onCheckout }) {
 
     const {
         cartItems,
+        cartTotal,
+        loading,
+        error,
         increaseQuantity,
         decreaseQuantity,
-        removeFromCart,
-        getCartTotal
+        removeFromCart
     } = useCart();
+
 
     return (
         <div className="cart-page">
@@ -17,97 +21,133 @@ function CartPage({ onContinueShopping, onCheckout }) {
 
                 <h1>Shopping Cart</h1>
 
-                {cartItems.length === 0 ? (
+
+                {error && (
+                    <p className="error-message">
+                        {error}
+                    </p>
+                )}
+
+
+                {loading && cartItems.length === 0 ? (
+
+                    <p>Loading cart...</p>
+
+                ) : cartItems.length === 0 ? (
 
                     <div className="empty-cart">
+
                         <p>Your cart is empty.</p>
 
                         <button
                             type="button"
                             onClick={onContinueShopping}
+                            disabled={loading}
                         >
                             Continue Shopping
                         </button>
+
                     </div>
 
                 ) : (
 
                     <>
+
                         {cartItems.map((item) => (
 
                             <div
                                 className="cart-item"
-                                key={item.book.id}
+                                key={item.bookId}
                             >
-                                <h3>{item.book.title}</h3>
+
+                                <h3>{item.title}</h3>
+
 
                                 <p>
-                                    Price: {Number(item.book.price).toFixed(2)}
+                                    Price: ₹
+                                    {Number(item.price).toFixed(2)}
                                 </p>
+
 
                                 <div className="quantity-controls">
 
                                     <button
                                         type="button"
                                         onClick={() =>
-                                            decreaseQuantity(item.book.id)
+                                            decreaseQuantity(item.bookId)
+                                        }
+                                        disabled={
+                                            loading ||
+                                            item.quantity <= 1
                                         }
                                     >
                                         -
                                     </button>
 
-                                    <span>{item.quantity}</span>
+
+                                    <span>
+                                        {item.quantity}
+                                    </span>
+
 
                                     <button
                                         type="button"
                                         onClick={() =>
-                                            increaseQuantity(item.book.id)
+                                            increaseQuantity(item.bookId)
                                         }
+                                        disabled={loading}
                                     >
                                         +
                                     </button>
 
                                 </div>
 
+
                                 <p>
-                                    Item Total: 
-                                    {(
-                                        Number(item.book.price) *
-                                        item.quantity
-                                    ).toFixed(2)}
+                                    Item Total: ₹
+                                    {Number(item.itemTotal).toFixed(2)}
                                 </p>
+
 
                                 <button
                                     type="button"
                                     className="remove-button"
                                     onClick={() =>
-                                        removeFromCart(item.book.id)
+                                        removeFromCart(item.bookId)
                                     }
+                                    disabled={loading}
                                 >
                                     Remove
                                 </button>
 
                             </div>
+
                         ))}
+
 
                         <div className="cart-summary">
 
                             <h2>
-                                Total: {getCartTotal().toFixed(2)}
+                                Total: ₹
+                                {Number(cartTotal).toFixed(2)}
                             </h2>
+
 
                             <div className="cart-actions">
 
                                 <button
                                     type="button"
                                     onClick={onContinueShopping}
+                                    disabled={loading}
                                 >
                                     Continue Shopping
                                 </button>
 
+
                                 <button
                                     type="button"
                                     onClick={onCheckout}
+                                    disabled={loading}
                                 >
                                     Checkout
                                 </button>
@@ -115,7 +155,9 @@ function CartPage({ onContinueShopping, onCheckout }) {
                             </div>
 
                         </div>
+
                     </>
+
                 )}
 
             </div>
@@ -123,5 +165,6 @@ function CartPage({ onContinueShopping, onCheckout }) {
         </div>
     );
 }
+
 
 export default CartPage;

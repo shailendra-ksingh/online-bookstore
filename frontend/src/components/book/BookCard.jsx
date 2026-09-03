@@ -4,19 +4,8 @@ function BookCard({ book }) {
 
     const { addToCart } = useCart();
 
-    const handleAddToCart = () => {
-
-        // Create a clean book object before adding to cart
-        const bookToAdd = {
-            id: book.id,
-            title: book.title,
-            author: book.author,
-            price: Number(book.price)
-        };
-
-        console.log("Adding book to cart:", bookToAdd);
-
-        addToCart(bookToAdd);
+    const handleAddToCart = async () => {
+        await addToCart(book);
     };
 
     return (
@@ -29,7 +18,7 @@ function BookCard({ book }) {
             </p>
 
             <p className="book-price">
-                {Number(book.price || 0).toFixed(2)}
+                ₹{Number(book.price || 0).toFixed(2)}
             </p>
 
             <button

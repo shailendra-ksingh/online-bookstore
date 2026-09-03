@@ -80,7 +80,7 @@ function Application() {
                     onOrderPlaced={(order) => {
 
                         alert(
-                            `Order placed successfully!\nOrder ID: ${order.id}`
+                            `Order placed successfully!\nOrder ID: ${order.orderId}`
                         );
 
                         setShowCheckout(false);

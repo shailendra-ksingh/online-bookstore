@@ -1,20 +1,39 @@
 import { useState } from "react";
 import { useCart } from "../context/useCart";
+import { createOrder } from "../api/orderApi";
+
 
 function CheckoutPage({ onBackToCart, onOrderPlaced }) {
 
-    const { cartItems, getCartTotal } = useCart();
+    const {
+        cartItems,
+        cartTotal,
+        loading: cartLoading,
+        loadCart
+    } = useCart();
 
-    const [loading, setLoading] = useState(false);
+    const [isPlacingOrder, setIsPlacingOrder] = useState(false);
+    const [error, setError] = useState("");
+
 
     const handlePlaceOrder = async () => {
 
-        setLoading(true);
+        if (cartItems.length === 0) {
+
+            setError("Your cart is empty.");
+            return;
+        }
+
+        setIsPlacingOrder(true);
+        setError("");
 
         try {
-            const order = {
-                id: Date.now()
-            };
+
+            const order = await createOrder();
+
+            // Refresh frontend cart because backend clears
+            // the cart after successful order creation.
+            await loadCart();
 
             onOrderPlaced(order);
 
@@ -22,11 +41,31 @@ function CheckoutPage({ onBackToCart, onOrderPlaced }) {
 
             console.error("Failed to place order", error);
 
+            setError(
+                "Unable to place order. Please try again."
+            );
+
         } finally {
 
-            setLoading(false);
+            setIsPlacingOrder(false);
         }
     };
+
+
+    if (cartLoading && cartItems.length === 0) {
+
+        return (
+            <div className="checkout-page">
+
+                <div className="checkout-container">
+
+                    <p>Loading order summary...</p>
+
+                </div>
+
+            </div>
+        );
+    }
 
 
     return (
@@ -36,70 +75,107 @@ function CheckoutPage({ onBackToCart, onOrderPlaced }) {
 
                 <h1>Order Summary</h1>
 
-                {cartItems.map((item) => (
 
-                    <div
-                        className="checkout-item"
-                        key={item.book.id}
-                    >
+                {error && (
+                    <p className="error-message">
+                        {error}
+                    </p>
+                )}
 
-                        <h3>
-                            {item.book.title}
-                        </h3>
 
-                        <p>
-                            Price: {Number(item.book.price).toFixed(2)}
-                        </p>
+                {cartItems.length === 0 ? (
 
-                        <p>
-                            Quantity: {item.quantity}
-                        </p>
+                    <div className="empty-cart">
 
-                        <p>
-                            Item Total: 
-                            {(
-                                Number(item.book.price) *
-                                item.quantity
-                            ).toFixed(2)}
-                        </p>
+                        <p>Your cart is empty.</p>
+
+                        <button
+                            type="button"
+                            onClick={onBackToCart}
+                        >
+                            Back to Cart
+                        </button>
 
                     </div>
 
-                ))}
+                ) : (
+
+                    <>
+
+                        {cartItems.map((item) => (
+
+                            <div
+                                className="checkout-item"
+                                key={item.bookId}
+                            >
+
+                                <h3>
+                                    {item.title}
+                                </h3>
 
 
-                <div className="checkout-summary">
-
-                    <h2>
-                        Total: {Number(getCartTotal()).toFixed(2)}
-                    </h2>
-
-
-                    <button
-                        type="button"
-                        onClick={onBackToCart}
-                        disabled={loading}
-                    >
-                        Back to Cart
-                    </button>
+                                <p>
+                                    Price: ₹
+                                    {Number(item.price).toFixed(2)}
+                                </p>
 
 
-                    <button
-                        type="button"
-                        onClick={handlePlaceOrder}
-                        disabled={loading}
-                    >
-                        {loading
-                            ? "Placing Order..."
-                            : "Place Order"}
-                    </button>
+                                <p>
+                                    Quantity: {item.quantity}
+                                </p>
 
-                </div>
+
+                                <p>
+                                    Item Total: ₹
+                                    {Number(item.itemTotal).toFixed(2)}
+                                </p>
+
+                            </div>
+
+                        ))}
+
+
+                        <div className="checkout-summary">
+
+                            <h2>
+                                Total: ₹
+                                {Number(cartTotal).toFixed(2)}
+                            </h2>
+
+
+                            <button
+                                type="button"
+                                onClick={onBackToCart}
+                                disabled={isPlacingOrder}
+                            >
+                                Back to Cart
+                            </button>
+
+
+                            <button
+                                type="button"
+                                onClick={handlePlaceOrder}
+                                disabled={
+                                    isPlacingOrder ||
+                                    cartLoading
+                                }
+                            >
+                                {isPlacingOrder
+                                    ? "Placing Order..."
+                                    : "Place Order"}
+                            </button>
+
+                        </div>
+
+                    </>
+
+                )}
 
             </div>
 
         </div>
     );
 }
+
 
 export default CheckoutPage;

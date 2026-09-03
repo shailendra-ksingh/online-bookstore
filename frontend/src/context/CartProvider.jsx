@@ -1,81 +1,175 @@
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { CartContext } from "./CartContext";
+
+import {
+    getCart,
+    addBookToCart,
+    updateCartQuantity,
+    removeCartItem
+} from "../api/cartApi";
+
 
 export function CartProvider({ children }) {
 
     const [cartItems, setCartItems] = useState([]);
+    const [cartTotal, setCartTotal] = useState(0);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState("");
 
-    const addToCart = (book) => {
 
-        setCartItems((previousItems) => {
+    const updateCartState = (cart) => {
 
-            const existingItem = previousItems.find(
-                (item) => item.book.id === book.id
+        setCartItems(cart.items || []);
+        setCartTotal(Number(cart.total || 0));
+    };
+
+
+    const loadCart = useCallback(async () => {
+
+        setLoading(true);
+        setError("");
+
+        try {
+
+            const cart = await getCart();
+
+            updateCartState(cart);
+
+        } catch (error) {
+
+            console.error("Failed to load cart", error);
+            setError("Unable to load cart.");
+
+        } finally {
+
+            setLoading(false);
+        }
+
+    }, []);
+
+
+    useEffect(() => {
+
+        void loadCart();
+
+    }, [loadCart]);
+
+
+    const addToCart = async (book) => {
+
+        setLoading(true);
+        setError("");
+
+        try {
+
+            const cart = await addBookToCart(book.id, 1);
+
+            updateCartState(cart);
+
+        } catch (error) {
+
+            console.error("Failed to add book to cart", error);
+            setError("Unable to add book to cart.");
+
+        } finally {
+
+            setLoading(false);
+        }
+    };
+
+
+    const increaseQuantity = async (bookId) => {
+
+        const item = cartItems.find(
+            (cartItem) => cartItem.bookId === bookId
+        );
+
+        if (!item || loading) {
+            return;
+        }
+
+        setLoading(true);
+        setError("");
+
+        try {
+
+            const cart = await updateCartQuantity(
+                bookId,
+                item.quantity + 1
             );
 
-            if (existingItem) {
+            updateCartState(cart);
 
-                return previousItems.map((item) =>
-                    item.book.id === book.id
-                        ? {
-                            ...item,
-                            quantity: item.quantity + 1
-                        }
-                        : item
-                );
-            }
+        } catch (error) {
 
-            return [
-                ...previousItems,
-                {
-                    book: book,
-                    quantity: 1
-                }
-            ];
-        });
+            console.error("Failed to increase quantity", error);
+            setError("Unable to update cart quantity.");
+
+        } finally {
+
+            setLoading(false);
+        }
     };
 
 
-    const increaseQuantity = (bookId) => {
+    const decreaseQuantity = async (bookId) => {
 
-        setCartItems((previousItems) =>
-            previousItems.map((item) =>
-                item.book.id === bookId
-                    ? {
-                        ...item,
-                        quantity: item.quantity + 1
-                    }
-                    : item
-            )
+        const item = cartItems.find(
+            (cartItem) => cartItem.bookId === bookId
         );
+
+        if (!item || item.quantity <= 1 || loading) {
+            return;
+        }
+
+        setLoading(true);
+        setError("");
+
+        try {
+
+            const cart = await updateCartQuantity(
+                bookId,
+                item.quantity - 1
+            );
+
+            updateCartState(cart);
+
+        } catch (error) {
+
+            console.error("Failed to decrease quantity", error);
+            setError("Unable to update cart quantity.");
+
+        } finally {
+
+            setLoading(false);
+        }
     };
 
 
-    const decreaseQuantity = (bookId) => {
+    const removeFromCart = async (bookId) => {
 
-        setCartItems((previousItems) =>
-            previousItems.map((item) =>
-                item.book.id === bookId
-                    ? {
-                        ...item,
-                        quantity: Math.max(
-                            1,
-                            item.quantity - 1
-                        )
-                    }
-                    : item
-            )
-        );
-    };
+        if (loading) {
+            return;
+        }
 
+        setLoading(true);
+        setError("");
 
-    const removeFromCart = (bookId) => {
+        try {
 
-        setCartItems((previousItems) =>
-            previousItems.filter(
-                (item) => item.book.id !== bookId
-            )
-        );
+            const cart = await removeCartItem(bookId);
+
+            updateCartState(cart);
+
+        } catch (error) {
+
+            console.error("Failed to remove cart item", error);
+            setError("Unable to remove item from cart.");
+
+        } finally {
+
+            setLoading(false);
+        }
     };
 
 
@@ -88,32 +182,20 @@ export function CartProvider({ children }) {
     };
 
 
-    // IMPORTANT: This was missing or named differently
-    const getCartTotal = () => {
-
-        return cartItems.reduce(
-            (total, item) =>
-                total + (item.book.price * item.quantity),
-            0
-        );
-    };
-
-
     const value = {
 
         cartItems,
+        cartTotal,
+        loading,
+        error,
 
+        loadCart,
         addToCart,
-
         increaseQuantity,
-
         decreaseQuantity,
-
         removeFromCart,
 
-        getCartItemCount,
-
-        getCartTotal
+        getCartItemCount
     };
 
 
