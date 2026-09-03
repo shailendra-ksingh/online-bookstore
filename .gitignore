@@ -67,3 +67,7 @@ temp/
 # Misc
 # =========================
 out.txt
+.idea/
+node_modules/
+dist/
+``
