@@ -1,0 +1,504 @@
+/* =========================
+   GLOBAL STYLING
+========================= */
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: Arial, Helvetica, sans-serif;
+  background-color: #f5f7fb;
+  color: #333;
+}
+
+button {
+  background-color: #2563eb;
+  color: white;
+
+  border: none;
+  border-radius: 6px;
+
+  padding: 10px 18px;
+
+  font-size: 15px;
+  font-weight: 500;
+
+  cursor: pointer;
+
+  transition: background-color 0.2s ease;
+}
+
+button:hover {
+  background-color: #1d4ed8;
+}
+
+button:disabled {
+  background-color: #94a3b8;
+  cursor: not-allowed;
+}
+
+
+/* =========================
+   MAIN APPLICATION
+========================= */
+
+.app {
+  min-height: 100vh;
+  background-color: #f5f7fb;
+}
+
+
+/* =========================
+   NAVIGATION BAR
+========================= */
+
+.navbar {
+  background-color: #1e3a5f;
+  color: white;
+
+  padding: 18px 40px;
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.navbar h2 {
+  margin: 0;
+  color: white;
+}
+
+.nav-actions {
+  display: flex;
+  gap: 12px;
+}
+
+
+/* =========================
+   MAIN CONTENT
+========================= */
+
+.content {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 30px 40px;
+}
+
+
+/* =========================
+   AUTHENTICATION PAGES
+========================= */
+
+.auth-page {
+  min-height: 100vh;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  padding: 20px;
+
+  background-color: #f5f7fb;
+}
+
+.auth-container {
+  width: 100%;
+  max-width: 560px;
+}
+
+.auth-card {
+  background: white;
+
+  padding: 40px;
+
+  border-radius: 12px;
+
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
+}
+
+.auth-card h1 {
+  text-align: center;
+
+  margin-top: 0;
+  margin-bottom: 30px;
+
+  color: #1e3a5f;
+
+  font-size: 32px;
+}
+
+
+/* =========================
+   FORMS
+========================= */
+
+form {
+  width: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+
+  margin-bottom: 20px;
+}
+
+.form-group label {
+  font-weight: 600;
+
+  color: #333;
+
+  margin-bottom: 8px;
+}
+
+.form-group input {
+  width: 100%;
+
+  padding: 12px;
+
+  font-size: 16px;
+
+  border: 1px solid #ccc;
+  border-radius: 6px;
+}
+
+.form-group input:focus {
+  outline: none;
+
+  border-color: #2563eb;
+
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+}
+
+
+/* Authentication buttons full width */
+
+.auth-card form button {
+  width: 100%;
+
+  padding: 14px;
+
+  font-size: 16px;
+}
+
+
+/* =========================
+   AUTH FOOTER
+========================= */
+
+.auth-footer {
+  margin-top: 30px;
+
+  padding-top: 25px;
+
+  text-align: center;
+
+  border-top: 1px solid #e5e7eb;
+}
+
+.auth-footer p {
+  margin-bottom: 15px;
+
+  color: #333;
+}
+
+.secondary-button {
+  width: 100%;
+
+  background-color: #6b7280 !important;
+}
+
+.secondary-button:hover {
+  background-color: #4b5563 !important;
+}
+
+
+/* =========================
+   ERROR MESSAGE
+========================= */
+
+.error-message {
+  color: #dc2626;
+
+  margin-bottom: 15px;
+
+  text-align: center;
+}
+
+
+/* =========================
+   BOOKS PAGE
+========================= */
+
+.books-page {
+  width: 100%;
+}
+
+.books-page h1 {
+  color: #1e3a5f;
+
+  margin-bottom: 30px;
+}
+
+
+/* If books are displayed as cards */
+
+.books-container {
+  display: grid;
+
+  grid-template-columns:
+    repeat(auto-fit, minmax(250px, 1fr));
+
+  gap: 20px;
+}
+
+
+/* Book card */
+
+.book-card {
+  background: white;
+
+  padding: 25px;
+
+  border-radius: 10px;
+
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+
+  transition:
+          transform 0.2s ease,
+          box-shadow 0.2s ease;
+}
+
+.book-card:hover {
+  transform: translateY(-3px);
+
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+}
+
+.book-card h3 {
+  margin-top: 0;
+
+  color: #1e3a5f;
+}
+
+.book-card p {
+  color: #555;
+}
+
+
+/* =========================
+   CART PAGE
+========================= */
+
+.cart-page {
+  min-height: calc(100vh - 70px);
+
+  padding: 40px 20px;
+
+  background-color: #f5f7fb;
+}
+
+.cart-container {
+  width: 100%;
+
+  max-width: 850px;
+
+  margin: 0 auto;
+}
+
+.cart-page h1 {
+  text-align: center;
+
+  color: #1e3a5f;
+
+  margin-top: 0;
+  margin-bottom: 30px;
+}
+
+
+/* Individual cart item */
+
+.cart-item {
+  background: white;
+
+  padding: 25px;
+
+  margin-bottom: 20px;
+
+  border-radius: 10px;
+
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+}
+
+.cart-item h3 {
+  margin-top: 0;
+
+  color: #1e3a5f;
+}
+
+.cart-item p {
+  margin: 10px 0;
+
+  color: #555;
+}
+
+
+/* =========================
+   QUANTITY CONTROLS
+========================= */
+
+.quantity-controls {
+  display: flex;
+
+  align-items: center;
+
+  gap: 15px;
+
+  margin: 18px 0;
+}
+
+.quantity-controls button {
+  min-width: 42px;
+
+  font-size: 18px;
+
+  padding: 8px 12px;
+}
+
+.quantity-controls span {
+  font-size: 17px;
+
+  font-weight: 600;
+}
+
+
+/* =========================
+   REMOVE BUTTON
+========================= */
+
+.remove-button {
+  background-color: #dc2626;
+}
+
+.remove-button:hover {
+  background-color: #b91c1c;
+}
+
+
+/* =========================
+   CART SUMMARY
+========================= */
+
+.cart-summary {
+  background: white;
+
+  padding: 25px;
+
+  margin-top: 25px;
+
+  border-radius: 10px;
+
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+}
+
+.cart-summary h2 {
+  margin-top: 0;
+
+  color: #1e3a5f;
+}
+
+
+/* =========================
+   CART ACTIONS
+========================= */
+
+.cart-actions {
+  display: flex;
+
+  gap: 15px;
+
+  margin-top: 20px;
+}
+
+
+/* =========================
+   CHECKOUT PAGE
+========================= */
+
+.checkout-page {
+  min-height: calc(100vh - 70px);
+
+  padding: 40px 20px;
+
+  background-color: #f5f7fb;
+}
+
+.checkout-container {
+  max-width: 700px;
+
+  margin: 0 auto;
+
+  background: white;
+
+  padding: 35px;
+
+  border-radius: 12px;
+
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.checkout-page h1 {
+  text-align: center;
+
+  color: #1e3a5f;
+}
+
+
+/* =========================
+   MOBILE SUPPORT
+========================= */
+
+@media (max-width: 768px) {
+
+  .navbar {
+    padding: 15px 20px;
+  }
+
+  .navbar h2 {
+    font-size: 20px;
+  }
+
+  .content {
+    padding: 20px;
+  }
+
+  .auth-card {
+    padding: 25px;
+  }
+
+  .cart-page {
+    padding: 25px 15px;
+  }
+
+  .cart-item {
+    padding: 20px;
+  }
+
+  .cart-actions {
+    flex-direction: column;
+  }
+
+  .cart-actions button {
+    width: 100%;
+  }
+
+  .checkout-container {
+    padding: 25px 20px;
+  }
+}
