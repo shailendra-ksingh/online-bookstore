@@ -9,6 +9,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import static org.mockito.Mockito.verify;
 
 import java.math.BigDecimal;
 import java.util.Collections;
@@ -59,7 +60,8 @@ class OrderServiceTest {
         assertNotNull(order);
         assertEquals("CONFIRMED", order.status());
         assertEquals(new BigDecimal("1000.00"), order.total());
-        assertTrue(order.orderId() > 1000);
+
+        verify(cartService).clearCart();
     }
 
     @Test

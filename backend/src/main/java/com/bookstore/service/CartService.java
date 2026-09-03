@@ -94,6 +94,11 @@ public class CartService {
         return getCart();
     }
 
+    public void clearCart() {
+
+        cartItems.clear();
+    }
+
     private Book findBook(Long bookId) {
 
         return bookRepository.findById(bookId)

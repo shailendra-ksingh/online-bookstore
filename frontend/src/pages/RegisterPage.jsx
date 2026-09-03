@@ -30,27 +30,19 @@ function RegisterPage({ onRegistrationComplete }) {
 
         const errorData = error.response?.data;
 
+        // Backend may return a plain string
         if (typeof errorData === "string") {
             return errorData;
         }
 
-        if (errorData?.message) {
-            return errorData.message;
-        }
-
-        if (errorData?.name) {
-            return errorData.name;
-        }
-
-        if (errorData?.email) {
-            return errorData.email;
-        }
-
-        if (errorData?.password) {
-            return errorData.password;
-        }
-
-        return "Unable to create account. Please try again.";
+        // Handle validation errors returned as an object
+        return (
+            errorData?.name ||
+            errorData?.email ||
+            errorData?.password ||
+            errorData?.message ||
+            "Unable to create account. Please try again."
+        );
     };
 
 
@@ -173,7 +165,7 @@ function RegisterPage({ onRegistrationComplete }) {
                                     value={form.password}
                                     onChange={handleChange}
                                     autoComplete="new-password"
-                                    minLength={6}
+                                    minLength={8}
                                     required
                                 />
 

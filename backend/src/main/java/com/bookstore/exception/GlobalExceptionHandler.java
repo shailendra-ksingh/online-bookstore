@@ -90,6 +90,18 @@ public class GlobalExceptionHandler {
         );
     }
 
+    @ExceptionHandler(IllegalStateException.class)
+    public ResponseEntity<ErrorResponse> handleIllegalStateException(
+            IllegalStateException exception) {
+
+        log.warn("Invalid operation: {}", exception.getMessage());
+
+        return buildErrorResponse(
+                HttpStatus.BAD_REQUEST,
+                exception.getMessage()
+        );
+    }
+
     private ResponseEntity<ErrorResponse> buildErrorResponse(
             HttpStatus status,
             String message) {

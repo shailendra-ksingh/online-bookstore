@@ -36,6 +36,7 @@ public class SecurityConfig {
                         headers.frameOptions(frameOptions ->
                                 frameOptions.disable()))
                 .authorizeHttpRequests(auth -> auth
+                        // as per KATA - Handle basic user authentication (login and registration)
                         // APIs are public for this simplified assignment because
                         // token/session-based authorization is not implemented.
                         // In production, cart and order endpoints should require authentication.

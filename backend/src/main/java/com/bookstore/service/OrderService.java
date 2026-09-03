@@ -33,10 +33,15 @@ public class OrderService {
 
         Long orderId = orderSequence.incrementAndGet();
 
-        return new OrderResponse(
+        OrderResponse orderResponse = new OrderResponse(
                 orderId,
                 cart.total(),
                 "CONFIRMED"
         );
+
+        // Clear cart after successful order creation.
+        cartService.clearCart();
+
+        return orderResponse;
     }
 }

@@ -52,35 +52,11 @@ export function CartProvider({ children }) {
     // Load cart when the provider is initialized
     useEffect(() => {
 
-        let isMounted = true;
+        // Cart loading is an intentional side effect when the provider mounts.
+        // eslint-disable-next-line react-hooks/set-state-in-effect
+        void loadCart();
 
-        const initializeCart = async () => {
-
-            try {
-
-                const cart = await getCart();
-
-                if (isMounted) {
-                    updateCartState(cart);
-                }
-
-            } catch (error) {
-
-                console.error("Failed to load cart", error);
-
-                if (isMounted) {
-                    setError("Unable to load cart.");
-                }
-            }
-        };
-
-        void initializeCart();
-
-        return () => {
-            isMounted = false;
-        };
-
-    }, [updateCartState]);
+    }, [loadCart]);
 
 
     const addToCart = async (book) => {

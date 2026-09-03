@@ -15,9 +15,11 @@ The application follows a simple layered architecture.
 ```text
                     React Frontend
                           |
-                       REST APIs
+                          v
+                      REST APIs
                           |
-                    Spring Boot
+                          v
+                     Spring Boot
                           |
           +---------------+---------------+
           |               |               |
@@ -25,11 +27,11 @@ The application follows a simple layered architecture.
           |               |               |
           +---------------+---------------+
                           |
+                          v
                      Repositories
                           |
-                         H2
-                          |
-                       Database
+                          v
+                    H2 Database
 ```
 
 ### Frontend Structure
@@ -46,6 +48,7 @@ React
  |    +-- Checkout
  |
  +-- Components
+ |    +-- BookCard
  |
  +-- Context
  |    +-- Authentication
@@ -54,7 +57,11 @@ React
  +-- API
       +-- Authentication
       +-- Books
+      +-- Cart
+      +-- Orders
 ```
+
+The frontend uses React Context for shared authentication and cart state.
 
 ### Backend Structure
 
@@ -115,7 +122,7 @@ Repository
 H2 Database
 ```
 
-Controllers are responsible for handling HTTP requests, while business logic is kept in service classes.
+Controllers handle HTTP requests, while business logic is kept in service classes.
 
 ---
 
@@ -123,31 +130,31 @@ Controllers are responsible for handling HTTP requests, while business logic is 
 
 ### Frontend
 
-- React
-- Vite
-- JavaScript
-- HTML/CSS
-- Fetch API
+* React
+* Vite
+* JavaScript
+* HTML/CSS
+* Axios
 
 ### Backend
 
-- Java 21
-- Spring Boot
-- Spring Web
-- Spring Data JPA
-- Spring Security
-- Maven
+* Java 21
+* Spring Boot
+* Spring Web
+* Spring Data JPA
+* Spring Security
+* Maven
 
 ### Database
 
-- H2 In-Memory Database
+* H2 In-Memory Database
 
 ### Development Tools
 
-- IntelliJ IDEA
-- Node.js
-- npm
-- Maven
+* IntelliJ IDEA
+* Node.js
+* npm
+* Maven
 
 ---
 
@@ -155,33 +162,35 @@ Controllers are responsible for handling HTTP requests, while business logic is 
 
 ### Book Management
 
-- Retrieve available books
-- Display book title, author and price
-- Book data is stored in H2
+* Retrieve available books
+* Display book title, author and price
+* Book data is stored in H2
 
 ### User Authentication
 
-- User registration
-- User login
-- Passwords stored using BCrypt hashing
-- Spring Security configuration for authentication
+* User registration
+* User login
+* Passwords stored using BCrypt hashing
+* Spring Security configuration for authentication
 
 ### Shopping Cart
 
-- Add books to cart
-- View cart
-- Increase/decrease quantity from the frontend
-- Remove books from cart
-- Calculate item totals
-- Calculate cart total
+* Add books to cart
+* View cart
+* Increase/decrease quantity
+* Remove books from cart
+* Calculate item totals
+* Calculate cart total
+* Backend returns calculated cart totals to the frontend
 
 ### Checkout
 
-- Display order summary
-- Display quantities and individual item totals
-- Calculate final order total
-- Place an order
-- Display order ID, total and confirmation status
+* Display order summary
+* Display quantities and individual item totals
+* Display final cart total
+* Place an order
+* Display order ID and confirmation status
+* Refresh cart state after successful order placement
 
 ---
 
@@ -191,10 +200,10 @@ Controllers are responsible for handling HTTP requests, while business logic is 
 
 Install:
 
-- Java 21
-- Maven
-- Node.js
-- npm
+* Java 21
+* Maven
+* Node.js
+* npm
 
 Verify installations:
 
@@ -257,13 +266,17 @@ Frontend normally runs on:
 http://localhost:5173
 ```
 
-If port 5173 is already in use, Vite may start on another port such as:
+If port 5173 is already in use, Vite may start on another available port.
 
-```text
-http://localhost:5174
+### Frontend Quality Checks
+
+Run ESLint:
+
+```bash
+npm run lint
 ```
 
-### Frontend Production Build
+Create a production build:
 
 ```bash
 npm run build
@@ -373,6 +386,26 @@ Example Response:
 }
 ```
 
+#### Update Cart Quantity
+
+```http
+PUT /api/v1/cart/{bookId}
+```
+
+Request:
+
+```json
+{
+  "quantity": 3
+}
+```
+
+Example:
+
+```http
+PUT /api/v1/cart/1
+```
+
 #### Remove Book from Cart
 
 ```http
@@ -415,7 +448,7 @@ A centralized exception handler is implemented using:
 @RestControllerAdvice
 ```
 
-For example, attempting to place an order with an empty cart returns a **400 Bad Request**.
+For example, attempting to place an order with an empty cart returns a `400 Bad Request`.
 
 Example:
 
@@ -426,18 +459,22 @@ Example:
 }
 ```
 
-This keeps exception handling out of individual controllers and provides a consistent API response.
+This keeps exception handling separate from controllers and provides consistent error responses.
+
+On the frontend, API errors are caught and displayed to the user where appropriate, such as login, registration, cart operations, and checkout.
 
 ---
 
 ## 7. Clean Code Principles Followed
 
-### Single Responsibility
+### Separation of Responsibilities
 
-- Controllers handle HTTP requests
-- Services contain business logic
-- Repositories handle database access
-- DTOs represent API request/response data
+* Controllers handle HTTP requests
+* Services contain business logic
+* Repositories handle database access
+* DTOs represent API request/response data
+* React Context manages shared frontend state
+* API modules keep HTTP calls separate from UI components
 
 ### Dependency Injection
 
@@ -463,126 +500,127 @@ Service
 Repository
 ```
 
-This makes the code easier to test and maintain.
+This keeps responsibilities separated and makes the code easier to understand and maintain.
 
 ### Reusable Components
 
-Common functionality is placed in services and reusable React components/context.
+Common functionality is placed in reusable services, React components, and contexts.
 
 Examples:
 
-- BookCard
-- CartContext
-- AuthContext
-- BookService
-- CartService
-- OrderService
+* BookCard
+* CartContext
+* AuthContext
+* BookService
+* CartService
+* OrderService
 
 ### DTOs
 
-DTOs are used instead of exposing request/response structures directly through entities.
+DTOs are used for API request and response objects.
 
 Examples:
 
-- RegisterRequest
-- LoginRequest
-- BookResponse
-- AddToCartRequest
-- CartResponse
-- OrderResponse
+* RegisterRequest
+* LoginRequest
+* BookResponse
+* AddToCartRequest
+* CartResponse
+* CartItemResponse
+* OrderResponse
 
 ### Centralized Error Handling
 
-Exceptions are handled centrally using:
+Backend exceptions are handled centrally using:
 
 ```text
 GlobalExceptionHandler
 ```
 
-instead of duplicating try/catch logic across controllers.
+This avoids repeating exception handling logic in individual controllers.
 
 ### Validation
 
 Basic validation is performed for values such as:
 
-- Required book ID
-- Quantity greater than zero
-- Empty cart before creating an order
+* Required book ID
+* Quantity greater than zero
+* Empty cart before creating an order
 
 ### Meaningful Naming
 
-Classes and methods use names that describe their responsibilities.
+Classes and methods use names based on their responsibilities.
 
 Examples:
 
-- CartService
-- OrderService
-- createOrder()
-- addToCart()
-- removeFromCart()
-- getCart()
+* CartService
+* OrderService
+* createOrder()
+* addToCart()
+* removeFromCart()
+* getCart()
 
 ### Minimal Comments
 
-Comments are used where they explain implementation decisions rather than describing obvious code.
+Comments are mainly used to explain decisions or non-obvious logic rather than obvious code.
 
 ---
 
 ## 8. Assumptions and Trade-offs
 
-Because this was a two-day technical assignment, implementation decisions were made to prioritize the explicitly requested functionality.
+Because this was a two-day technical assignment, the implementation focuses on the required functionality and keeps the design intentionally simple.
 
 ### H2 Database
 
-H2 was selected because it requires minimal configuration and is suitable for demonstrating database persistence during development.
+H2 was selected because it requires minimal configuration and is suitable for demonstrating database functionality during development.
 
-A production deployment would typically use a persistent database such as MySQL or PostgreSQL.
+A production application would typically use a persistent database such as MySQL or PostgreSQL.
 
 ### In-Memory Cart
 
 The cart is currently maintained in memory.
 
-This keeps the implementation small and demonstrates the required cart REST APIs.
+This keeps the implementation small and focuses on demonstrating the required cart REST APIs.
 
-In a production system, the cart would be persisted and associated with the authenticated user.
+In a production application, the cart would normally be persisted and associated with the authenticated user.
 
 ### Simplified Order Processing
 
-The order API validates the cart, calculates the total on the backend and returns an order confirmation.
+The order API validates the cart, calculates the total on the backend, and returns an order confirmation.
 
 The current implementation does not persist orders.
 
-This was a deliberate time-boxing decision.
+This was kept simple due to the time-boxed nature of the assignment.
 
 ### Server-Side Price Calculation
 
-The backend calculates the order total using book prices from the backend/cart rather than trusting a total supplied by the frontend.
+The backend calculates the final order total using backend book/cart data rather than trusting a total sent by the frontend.
 
-This prevents the frontend from being the source of truth for the final price.
+This ensures the backend remains the source of truth for pricing.
 
 ### Simple Authentication
 
-Basic registration and login were implemented using Spring Security.
+Basic registration and login are implemented using Spring Security.
 
-JWT-based authentication is not implemented; basic authentication using Spring Security is provided as required by the assignment.
+JWT/token-based authentication is not included because the assignment was kept intentionally small and focused on the required functionality.
 
 ---
 
 ## 9. Known Limitations
 
-The following are known limitations of the time-boxed implementation:
+The following limitations are known in the current implementation:
 
-- Cart data is stored in memory and is not persistent.
-- Cart data is not currently associated with individual users.
-- Orders are not persisted in the database.
-- No payment gateway is implemented.
-- JWT/token-based authentication is not implemented.
-- No admin functionality is included.
-- No book create/update/delete functionality is included because only book retrieval was required.
-- No search, filtering, or pagination is implemented.
-- The frontend currently uses the local backend URL during development.
-- H2 is an in-memory database, so data is lost when the application restarts.
-- Production concerns such as distributed caching, monitoring, and centralized logging are outside the scope of this assignment.
+* Cart data is stored in memory and is not persistent.
+* Cart data is not currently associated with individual users.
+* Orders are not persisted in the database.
+* No payment gateway is implemented.
+* JWT/token-based authentication is not implemented.
+* No admin functionality is included.
+* No book create/update/delete functionality is included because only book retrieval was required.
+* No search, filtering, or pagination is implemented.
+* The frontend is configured for local development.
+* H2 is an in-memory database, so data is lost when the application restarts.
+* Production concerns such as distributed caching, monitoring, and centralized logging are outside the scope of this assignment.
 
 ---
 
@@ -596,20 +634,20 @@ In-memory cart                  Persistent UserCart/UserCartItem
 Non-persistent order            Order/OrderItem database entities
 Basic authentication            JWT/OAuth2
 Local API URL                   Environment-based configuration
-Basic validation                Bean Validation
+Basic validation                More comprehensive Bean Validation
 Basic error response            Standard API error model
 No payment                      Payment gateway integration
 No inventory                    Inventory management
 No observability                Logging + metrics + tracing
 ```
 
-The current architecture keeps these extensions possible without requiring the frontend to be completely redesigned.
+The current separation between frontend, API, service, and repository layers makes these extensions possible without major changes to the overall structure.
 
 ---
 
 ## 11. Scope
 
-The implementation focuses on the following requested business flow:
+The implementation focuses on the following business flow:
 
 ```text
 Register
@@ -639,4 +677,5 @@ Place Order
 Order Confirmation
 ```
 
-The project intentionally avoids implementing features outside the assignment scope in order to keep the solution maintainable and achievable within the two-day time constraint.
+The project intentionally avoids adding features outside the assignment scope in order to keep the implementation focused and achievable within the three-day time constraint.
+
