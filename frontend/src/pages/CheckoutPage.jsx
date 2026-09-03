@@ -12,8 +12,6 @@ function CheckoutPage({ onBackToCart, onOrderPlaced }) {
         setLoading(true);
 
         try {
-
-            // Temporary order until Order API is implemented
             const order = {
                 id: Date.now()
             };
@@ -50,7 +48,7 @@ function CheckoutPage({ onBackToCart, onOrderPlaced }) {
                         </h3>
 
                         <p>
-                            Price: ₹{Number(item.book.price).toFixed(2)}
+                            Price: {Number(item.book.price).toFixed(2)}
                         </p>
 
                         <p>
@@ -58,7 +56,7 @@ function CheckoutPage({ onBackToCart, onOrderPlaced }) {
                         </p>
 
                         <p>
-                            Item Total: ₹
+                            Item Total: 
                             {(
                                 Number(item.book.price) *
                                 item.quantity
@@ -73,7 +71,7 @@ function CheckoutPage({ onBackToCart, onOrderPlaced }) {
                 <div className="checkout-summary">
 
                     <h2>
-                        Total: ₹{Number(getCartTotal()).toFixed(2)}
+                        Total: {Number(getCartTotal()).toFixed(2)}
                     </h2>
 
 

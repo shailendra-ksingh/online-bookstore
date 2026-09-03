@@ -42,7 +42,7 @@ function CartPage({ onContinueShopping, onCheckout }) {
                                 <h3>{item.book.title}</h3>
 
                                 <p>
-                                    Price: ₹{Number(item.book.price).toFixed(2)}
+                                    Price: {Number(item.book.price).toFixed(2)}
                                 </p>
 
                                 <div className="quantity-controls">
@@ -70,7 +70,7 @@ function CartPage({ onContinueShopping, onCheckout }) {
                                 </div>
 
                                 <p>
-                                    Item Total: ₹
+                                    Item Total: 
                                     {(
                                         Number(item.book.price) *
                                         item.quantity
@@ -93,7 +93,7 @@ function CartPage({ onContinueShopping, onCheckout }) {
                         <div className="cart-summary">
 
                             <h2>
-                                Total: ₹{getCartTotal().toFixed(2)}
+                                Total: {getCartTotal().toFixed(2)}
                             </h2>
 
                             <div className="cart-actions">

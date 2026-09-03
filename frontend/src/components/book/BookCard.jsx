@@ -29,7 +29,7 @@ function BookCard({ book }) {
             </p>
 
             <p className="book-price">
-                ₹{Number(book.price || 0).toFixed(2)}
+                {Number(book.price || 0).toFixed(2)}
             </p>
 
             <button
