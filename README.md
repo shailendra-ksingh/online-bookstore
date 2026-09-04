@@ -6,7 +6,6 @@ The application allows users to register and log in, browse books, manage a shop
 
 This project was developed as a technical assignment with an emphasis on clean, maintainable code and a clear separation of responsibilities between the frontend and backend.
 
-
 ## Features
 
 ### User Management
@@ -33,7 +32,6 @@ This project was developed as a technical assignment with an emphasis on clean, 
 - Review order summary
 - Create an order from the current cart
 - Clear the cart after successful checkout
-
 
 ## Architecture
 
@@ -65,7 +63,6 @@ The frontend is responsible for the user interface and client-side state.
 
 The backend handles business logic, validation, security, and data access.
 
-
 ## Project Structure
 
 ```text
@@ -86,7 +83,6 @@ online-bookstore
     +-- security
     +-- service
 ```
-
 
 ## Technologies
 
@@ -123,7 +119,7 @@ Open a terminal and run:
 ```
 cd online-bookstore\backend
 mvn spring-boot:run
-````
+```
 
 The backend starts at:
 
@@ -235,8 +231,6 @@ Common scenarios include:
 - Missing books or cart items
 - Empty cart checkout
 
----
-
 ## Security
 
 Spring Security is configured for authentication-related flows.
@@ -253,8 +247,6 @@ mvn clean test
 
 Unit tests cover the core business logic for authentication, cart operations, and order creation.
 
----
-
 ## Design Decisions
 
 - Layered architecture (Controller → Service → Repository)
@@ -263,15 +255,13 @@ Unit tests cover the core business logic for authentication, cart operations, an
 - React Context used for authentication and cart state management
 - Centralized API communication using Axios
 
-
 ## Database
 
 The application uses an H2 in-memory database, so no external database setup is required.
 
 Data is reset when the application restarts.
 
-
-## Code Quality, Separation of Concerns
+## Code Quality and Separation of Concerns
 
 The project follows common clean code and design practices to keep the application easy to understand and maintain.
 
