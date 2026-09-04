@@ -1,23 +1,15 @@
 import { useCart } from "../../context/useCart";
 
-
 function BookCard({ book }) {
 
-    const {
-        addToCart,
-        loading
-    } = useCart();
-
+    const { addToCart, loading } = useCart();
 
     const handleAddToCart = async () => {
 
-        if (loading) {
-            return;
-        }
+        if (loading) return;
 
         await addToCart(book);
     };
-
 
     return (
         <div className="book-card">
@@ -37,14 +29,11 @@ function BookCard({ book }) {
                 onClick={handleAddToCart}
                 disabled={loading}
             >
-                {loading
-                    ? "Adding..."
-                    : "Add to Cart"}
+                {loading ? "Adding..." : "Add to Cart"}
             </button>
 
         </div>
     );
 }
-
 
 export default BookCard;

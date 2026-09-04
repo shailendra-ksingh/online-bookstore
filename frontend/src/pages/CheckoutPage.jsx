@@ -2,7 +2,6 @@ import { useState } from "react";
 import { useCart } from "../context/useCart";
 import { createOrder } from "../api/orderApi";
 
-
 function CheckoutPage({ onBackToCart, onOrderPlaced }) {
 
     const {
@@ -15,11 +14,9 @@ function CheckoutPage({ onBackToCart, onOrderPlaced }) {
     const [isPlacingOrder, setIsPlacingOrder] = useState(false);
     const [error, setError] = useState("");
 
-
     const handlePlaceOrder = async () => {
 
         if (cartItems.length === 0) {
-
             setError("Your cart is empty.");
             return;
         }
@@ -28,57 +25,34 @@ function CheckoutPage({ onBackToCart, onOrderPlaced }) {
         setError("");
 
         try {
-
             const order = await createOrder();
 
-            // Refresh frontend cart because backend clears
-            // the cart after successful order creation.
             try {
-
                 await loadCart();
-
             } catch (cartError) {
-
-                // Order was successful, so cart refresh failure
-                // should not be treated as order failure.
-                console.error(
-                    "Order placed successfully, but cart refresh failed",
-                    cartError
-                );
+                console.error("Failed to refresh cart", cartError);
             }
 
             onOrderPlaced(order);
 
         } catch (error) {
-
             console.error("Failed to place order", error);
-
-            setError(
-                "Unable to place order. Please try again."
-            );
+            setError("Unable to place order. Please try again.");
 
         } finally {
-
             setIsPlacingOrder(false);
         }
     };
 
-
     if (cartLoading && cartItems.length === 0) {
-
         return (
             <div className="checkout-page">
-
                 <div className="checkout-container">
-
                     <p>Loading order summary...</p>
-
                 </div>
-
             </div>
         );
     }
-
 
     return (
         <div className="checkout-page">
@@ -87,13 +61,11 @@ function CheckoutPage({ onBackToCart, onOrderPlaced }) {
 
                 <h1>Order Summary</h1>
 
-
                 {error && (
                     <p className="error-message">
                         {error}
                     </p>
                 )}
-
 
                 {cartItems.length === 0 ? (
 
@@ -114,7 +86,6 @@ function CheckoutPage({ onBackToCart, onOrderPlaced }) {
                 ) : (
 
                     <>
-
                         {cartItems.map((item) => (
 
                             <div
@@ -122,39 +93,29 @@ function CheckoutPage({ onBackToCart, onOrderPlaced }) {
                                 key={item.bookId}
                             >
 
-                                <h3>
-                                    {item.title}
-                                </h3>
-
+                                <h3>{item.title}</h3>
 
                                 <p>
-                                    Price: 
-                                    {Number(item.price).toFixed(2)}
+                                    Price: {Number(item.price).toFixed(2)}
                                 </p>
-
 
                                 <p>
                                     Quantity: {item.quantity}
                                 </p>
 
-
                                 <p>
-                                    Item Total: 
-                                    {Number(item.itemTotal).toFixed(2)}
+                                    Item Total: {Number(item.itemTotal).toFixed(2)}
                                 </p>
 
                             </div>
 
                         ))}
 
-
                         <div className="checkout-summary">
 
                             <h2>
-                                Total:
-                                {Number(cartTotal).toFixed(2)}
+                                Total: {Number(cartTotal).toFixed(2)}
                             </h2>
-
 
                             <button
                                 type="button"
@@ -165,14 +126,10 @@ function CheckoutPage({ onBackToCart, onOrderPlaced }) {
                                 Back to Cart
                             </button>
 
-
                             <button
                                 type="button"
                                 onClick={handlePlaceOrder}
-                                disabled={
-                                    isPlacingOrder ||
-                                    cartLoading
-                                }
+                                disabled={isPlacingOrder || cartLoading}
                             >
                                 {isPlacingOrder
                                     ? "Placing Order..."
@@ -180,7 +137,6 @@ function CheckoutPage({ onBackToCart, onOrderPlaced }) {
                             </button>
 
                         </div>
-
                     </>
 
                 )}
@@ -190,6 +146,5 @@ function CheckoutPage({ onBackToCart, onOrderPlaced }) {
         </div>
     );
 }
-
 
 export default CheckoutPage;

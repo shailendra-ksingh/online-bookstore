@@ -36,7 +36,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleUserAlreadyExistsException(
             UserAlreadyExistsException exception) {
 
-        log.warn("Registration failed: user already exists");
+        log.warn("User already exists: {}", exception.getMessage());
 
         return buildErrorResponse(
                 HttpStatus.CONFLICT,
@@ -48,7 +48,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleBadCredentialsException(
             BadCredentialsException exception) {
 
-        log.warn("Authentication failed");
+        log.warn("Invalid login attempt");
 
         return buildErrorResponse(
                 HttpStatus.UNAUTHORIZED,
@@ -60,34 +60,20 @@ public class GlobalExceptionHandler {
     public ResponseEntity<Map<String, String>> handleValidationException(
             MethodArgumentNotValidException exception) {
 
-        log.warn("Request validation failed: {} field error(s)",
-                exception.getBindingResult().getErrorCount());
+        log.warn("Request validation failed");
 
-        Map<String, String> errors =
-                exception.getBindingResult()
-                        .getFieldErrors()
-                        .stream()
-                        .collect(Collectors.toMap(
-                                FieldError::getField,
-                                FieldError::getDefaultMessage,
-                                (firstMessage, secondMessage) -> firstMessage
-                        ));
+        Map<String, String> errors = exception.getBindingResult()
+                .getFieldErrors()
+                .stream()
+                .collect(Collectors.toMap(
+                        FieldError::getField,
+                        FieldError::getDefaultMessage,
+                        (firstMessage, secondMessage) -> firstMessage
+                ));
 
         return ResponseEntity
                 .badRequest()
                 .body(errors);
-    }
-
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<ErrorResponse> handleException(
-            Exception exception) {
-
-        log.error("Unexpected error", exception);
-
-        return buildErrorResponse(
-                HttpStatus.INTERNAL_SERVER_ERROR,
-                "An unexpected error occurred"
-        );
     }
 
     @ExceptionHandler(IllegalStateException.class)
@@ -102,6 +88,20 @@ public class GlobalExceptionHandler {
         );
     }
 
+    // Fallback for exceptions that are not handled above.
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ErrorResponse> handleException(
+            Exception exception) {
+
+        log.error("Unexpected error", exception);
+
+        return buildErrorResponse(
+                HttpStatus.INTERNAL_SERVER_ERROR,
+                "An unexpected error occurred"
+        );
+    }
+
+    // Keeps the common error response creation in one place.
     private ResponseEntity<ErrorResponse> buildErrorResponse(
             HttpStatus status,
             String message) {

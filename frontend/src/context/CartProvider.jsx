@@ -8,7 +8,6 @@ import {
     removeCartItem
 } from "../api/cartApi";
 
-
 export function CartProvider({ children }) {
 
     const [cartItems, setCartItems] = useState([]);
@@ -16,75 +15,52 @@ export function CartProvider({ children }) {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
 
-
     const updateCartState = useCallback((cart) => {
-
         setCartItems(cart.items || []);
         setCartTotal(Number(cart.total || 0));
-
     }, []);
 
-
     const loadCart = useCallback(async () => {
-
         setLoading(true);
         setError("");
 
         try {
-
             const cart = await getCart();
-
             updateCartState(cart);
 
         } catch (error) {
-
             console.error("Failed to load cart", error);
             setError("Unable to load cart.");
 
         } finally {
-
             setLoading(false);
         }
-
     }, [updateCartState]);
 
-
-    // Load cart when the provider is initialized
     useEffect(() => {
-
-        // Cart loading is an intentional side effect when the provider mounts.
         // eslint-disable-next-line react-hooks/set-state-in-effect
         void loadCart();
-
     }, [loadCart]);
-
 
     const addToCart = async (book) => {
 
-        if (loading) {
-            return;
-        }
+        if (loading) return;
 
         setLoading(true);
         setError("");
 
         try {
-
             const cart = await addBookToCart(book.id, 1);
-
             updateCartState(cart);
 
         } catch (error) {
-
             console.error("Failed to add book to cart", error);
             setError("Unable to add book to cart.");
 
         } finally {
-
             setLoading(false);
         }
     };
-
 
     const increaseQuantity = async (bookId) => {
 
@@ -92,15 +68,12 @@ export function CartProvider({ children }) {
             (cartItem) => cartItem.bookId === bookId
         );
 
-        if (!item || loading) {
-            return;
-        }
+        if (!item || loading) return;
 
         setLoading(true);
         setError("");
 
         try {
-
             const cart = await updateCartQuantity(
                 bookId,
                 item.quantity + 1
@@ -109,16 +82,13 @@ export function CartProvider({ children }) {
             updateCartState(cart);
 
         } catch (error) {
-
             console.error("Failed to increase quantity", error);
             setError("Unable to update cart quantity.");
 
         } finally {
-
             setLoading(false);
         }
     };
-
 
     const decreaseQuantity = async (bookId) => {
 
@@ -126,15 +96,12 @@ export function CartProvider({ children }) {
             (cartItem) => cartItem.bookId === bookId
         );
 
-        if (!item || item.quantity <= 1 || loading) {
-            return;
-        }
+        if (!item || item.quantity <= 1 || loading) return;
 
         setLoading(true);
         setError("");
 
         try {
-
             const cart = await updateCartQuantity(
                 bookId,
                 item.quantity - 1
@@ -143,69 +110,53 @@ export function CartProvider({ children }) {
             updateCartState(cart);
 
         } catch (error) {
-
             console.error("Failed to decrease quantity", error);
             setError("Unable to update cart quantity.");
 
         } finally {
-
             setLoading(false);
         }
     };
 
-
     const removeFromCart = async (bookId) => {
 
-        if (loading) {
-            return;
-        }
+        if (loading) return;
 
         setLoading(true);
         setError("");
 
         try {
-
             const cart = await removeCartItem(bookId);
-
             updateCartState(cart);
 
         } catch (error) {
-
             console.error("Failed to remove cart item", error);
             setError("Unable to remove item from cart.");
 
         } finally {
-
             setLoading(false);
         }
     };
 
-
     const getCartItemCount = () => {
-
         return cartItems.reduce(
             (total, item) => total + item.quantity,
             0
         );
     };
 
-
     const value = {
-
         cartItems,
         cartTotal,
         loading,
         error,
-
         loadCart,
         addToCart,
         increaseQuantity,
         decreaseQuantity,
         removeFromCart,
-
         getCartItemCount
     };
-
 
     return (
         <CartContext.Provider value={value}>

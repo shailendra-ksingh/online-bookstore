@@ -20,11 +20,8 @@ public class CartService {
 
     private final BookRepository bookRepository;
 
-    /*
-     * For this assignment, the cart is kept in memory to keep the implementation simple.
-     * In a production application, cart data would typically be persisted and associated
-     * with the authenticated user.
-     */
+    // Keeping the cart in memory for this assignment.
+    // In a real application, it would normally be stored per user.
     private final Map<Long, Integer> cartItems = new ConcurrentHashMap<>();
 
     public CartService(BookRepository bookRepository) {
@@ -95,7 +92,6 @@ public class CartService {
     }
 
     public void clearCart() {
-
         cartItems.clear();
     }
 

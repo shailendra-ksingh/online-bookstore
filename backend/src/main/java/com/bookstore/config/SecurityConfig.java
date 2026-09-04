@@ -20,7 +20,6 @@ import java.util.List;
 @Configuration
 public class SecurityConfig {
 
-    // Frontend URL is configurable to avoid hardcoding environment-specific values.
     @Value("${app.cors.allowed-origin}")
     private String allowedOrigin;
 
@@ -29,17 +28,14 @@ public class SecurityConfig {
 
         http
                 .cors(Customizer.withDefaults())
-                // CSRF is disabled because this application currently does not use cookie-based sessions.
                 .csrf(AbstractHttpConfigurer::disable)
-                // Required for accessing the H2 console during local development.
+
+                // Required for H2 console access
                 .headers(headers ->
                         headers.frameOptions(frameOptions ->
                                 frameOptions.disable()))
+
                 .authorizeHttpRequests(auth -> auth
-                        // as per KATA - Handle basic user authentication (login and registration)
-                        // APIs are public for this simplified assignment because
-                        // token/session-based authorization is not implemented.
-                        // In production, cart and order endpoints should require authentication.
                         .requestMatchers(
                                 "/api/v1/auth/**",
                                 "/api/v1/books/**",
@@ -55,8 +51,6 @@ public class SecurityConfig {
 
     @Bean
     public PasswordEncoder passwordEncoder() {
-        // BCrypt hashes passwords before they are stored in the database.
-        // APIs are public for this simplified assignment because
         return new BCryptPasswordEncoder();
     }
 
@@ -76,7 +70,7 @@ public class SecurityConfig {
         configuration.setAllowedOrigins(List.of(allowedOrigin));
 
         configuration.setAllowedMethods(
-                List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS")
+                List.of("GET", "POST", "PUT", "DELETE", "PATCH")
         );
 
         configuration.setAllowedHeaders(List.of("*"));

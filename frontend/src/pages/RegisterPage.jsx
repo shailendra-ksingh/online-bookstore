@@ -30,12 +30,12 @@ function RegisterPage({ onRegistrationComplete }) {
 
         const errorData = error.response?.data;
 
-        // Backend may return a plain string
+        // Sometimes the backend sends the error directly as text.
         if (typeof errorData === "string") {
             return errorData;
         }
 
-        // Handle validation errors returned as an object
+        // Pick the validation message based on the field returned by the API.
         return (
             errorData?.name ||
             errorData?.email ||

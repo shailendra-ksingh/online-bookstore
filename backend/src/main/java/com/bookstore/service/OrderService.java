@@ -11,10 +11,8 @@ public class OrderService {
 
     private final CartService cartService;
 
-    /*
-     * Simple in-memory order ID generation for this assignment.
-     * A production application would persist orders and use a database-generated ID.
-     */
+    // Using an in-memory sequence for order IDs in this assignment.
+    // Normally, orders and their IDs would come from the database.
     private final AtomicLong orderSequence = new AtomicLong(1000);
 
     public OrderService(CartService cartService) {
@@ -39,7 +37,7 @@ public class OrderService {
                 "CONFIRMED"
         );
 
-        // Clear cart after successful order creation.
+        // Order is created successfully, so clear the current cart.
         cartService.clearCart();
 
         return orderResponse;
