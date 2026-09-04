@@ -29,7 +29,7 @@ class CartServiceTest {
     private CartService cartService;
 
     @Test
-    void shouldAddBookToCartSuccessfully() {
+    void addBookToCart() {
 
         Book book = createBook(
                 1L,
@@ -52,7 +52,7 @@ class CartServiceTest {
     }
 
     @Test
-    void shouldIncreaseQuantityWhenSameBookAddedAgain() {
+    void addingSameBookAgainShouldIncreaseQuantity() {
 
         Book book = createBook(
                 1L,
@@ -66,8 +66,9 @@ class CartServiceTest {
 
         cartService.addToCart(new AddToCartRequest(1L, 1));
 
-        CartResponse response =
-                cartService.addToCart(new AddToCartRequest(1L, 2));
+        CartResponse response = cartService.addToCart(
+                new AddToCartRequest(1L, 2)
+        );
 
         assertEquals(1, response.items().size());
         assertEquals(3, response.items().get(0).quantity());
@@ -75,7 +76,7 @@ class CartServiceTest {
     }
 
     @Test
-    void shouldCalculateTotalForMultipleBooks() {
+    void calculateTotalForMultipleBooks() {
 
         Book cleanCode = createBook(
                 1L,
@@ -98,15 +99,17 @@ class CartServiceTest {
                 .thenReturn(Optional.of(effectiveJava));
 
         cartService.addToCart(new AddToCartRequest(1L, 2));
-        CartResponse response =
-                cartService.addToCart(new AddToCartRequest(2L, 1));
+
+        CartResponse response = cartService.addToCart(
+                new AddToCartRequest(2L, 1)
+        );
 
         assertEquals(2, response.items().size());
         assertEquals(BigDecimal.valueOf(1700), response.total());
     }
 
     @Test
-    void shouldUpdateCartItemQuantity() {
+    void updateCartItemQuantity() {
 
         Book book = createBook(
                 1L,
@@ -120,15 +123,14 @@ class CartServiceTest {
 
         cartService.addToCart(new AddToCartRequest(1L, 1));
 
-        CartResponse response =
-                cartService.updateQuantity(1L, 3);
+        CartResponse response = cartService.updateQuantity(1L, 3);
 
         assertEquals(3, response.items().get(0).quantity());
         assertEquals(BigDecimal.valueOf(1500), response.total());
     }
 
     @Test
-    void shouldRemoveBookFromCartSuccessfully() {
+    void removeBookFromCart() {
 
         Book book = createBook(
                 1L,
@@ -140,19 +142,16 @@ class CartServiceTest {
         when(bookRepository.findById(1L))
                 .thenReturn(Optional.of(book));
 
-        cartService.addToCart(
-                new AddToCartRequest(1L, 1)
-        );
+        cartService.addToCart(new AddToCartRequest(1L, 1));
 
-        CartResponse response =
-                cartService.removeFromCart(1L);
+        CartResponse response = cartService.removeFromCart(1L);
 
         assertTrue(response.items().isEmpty());
         assertEquals(BigDecimal.ZERO, response.total());
     }
 
     @Test
-    void shouldThrowExceptionWhenBookDoesNotExist() {
+    void throwExceptionWhenBookDoesNotExist() {
 
         when(bookRepository.findById(99L))
                 .thenReturn(Optional.empty());
@@ -166,7 +165,7 @@ class CartServiceTest {
     }
 
     @Test
-    void shouldThrowExceptionWhenUpdatingBookNotInCart() {
+    void throwExceptionWhenUpdatingItemNotInCart() {
 
         assertThrows(
                 CartItemNotFoundException.class,
@@ -181,6 +180,7 @@ class CartServiceTest {
             BigDecimal price) {
 
         Book book = new Book(title, author, price);
+
         ReflectionTestUtils.setField(book, "id", id);
 
         return book;

@@ -30,16 +30,16 @@ class AuthControllerTest {
     private AuthService authService;
 
     @Test
-    void shouldRegisterUserAndReturn201Created() throws Exception {
+    void registerUser_shouldReturnCreated() throws Exception {
 
-        UserResponse response = new UserResponse(
+        UserResponse user = new UserResponse(
                 1L,
                 "John Doe",
                 "john@example.com"
         );
 
         when(authService.register(any()))
-                .thenReturn(response);
+                .thenReturn(user);
 
         String request = """
                 {
@@ -59,7 +59,7 @@ class AuthControllerTest {
     }
 
     @Test
-    void shouldReturn400WhenRegistrationRequestIsInvalid()
+    void registerUser_withInvalidData_shouldReturnBadRequest()
             throws Exception {
 
         String request = """
@@ -80,12 +80,14 @@ class AuthControllerTest {
     }
 
     @Test
-    void shouldReturn401WhenLoginCredentialsAreInvalid()
+    void login_withInvalidCredentials_shouldReturnUnauthorized()
             throws Exception {
 
         when(authService.login(any()))
-                .thenThrow(new org.springframework.security.authentication
-                        .BadCredentialsException("Invalid credentials"));
+                .thenThrow(
+                        new org.springframework.security.authentication
+                                .BadCredentialsException("Invalid credentials")
+                );
 
         String request = """
                 {

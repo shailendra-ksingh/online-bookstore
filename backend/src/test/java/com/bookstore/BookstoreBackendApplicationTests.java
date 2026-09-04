@@ -8,6 +8,6 @@ class BookstoreBackendApplicationTests {
 
 	@Test
 	void contextLoads() {
-		// verifies that the Spring application starts successfully
+		// Basic smoke test to verify that the Spring context loads successfully.
 	}
 }

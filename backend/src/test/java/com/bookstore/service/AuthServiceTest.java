@@ -19,8 +19,11 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -38,11 +41,12 @@ class AuthServiceTest {
     @InjectMocks
     private AuthService authService;
 
-    private RegisterRequest registerRequest;
+    private RegisterRequest request;
 
     @BeforeEach
     void setUp() {
-        registerRequest = new RegisterRequest(
+
+        request = new RegisterRequest(
                 "John Doe",
                 "john@example.com",
                 "password123"
@@ -50,45 +54,42 @@ class AuthServiceTest {
     }
 
     @Test
-    void shouldRegisterUserSuccessfully() {
+    void shouldRegisterUser() {
 
-        when(userRepository.existsByEmail(registerRequest.email()))
+        when(userRepository.existsByEmail(request.email()))
                 .thenReturn(false);
 
-        when(passwordEncoder.encode(registerRequest.password()))
+        when(passwordEncoder.encode(request.password()))
                 .thenReturn("encodedPassword");
 
-        User savedUser = new User(
-                registerRequest.name(),
-                registerRequest.email(),
+        User user = new User(
+                request.name(),
+                request.email(),
                 "encodedPassword"
         );
 
         when(userRepository.save(any(User.class)))
-                .thenReturn(savedUser);
+                .thenReturn(user);
 
-        UserResponse response = authService.register(registerRequest);
+        UserResponse response = authService.register(request);
 
         assertNotNull(response);
         assertEquals("John Doe", response.name());
         assertEquals("john@example.com", response.email());
 
-        verify(passwordEncoder)
-                .encode(registerRequest.password());
-
-        verify(userRepository)
-                .save(any(User.class));
+        verify(passwordEncoder).encode(request.password());
+        verify(userRepository).save(any(User.class));
     }
 
     @Test
-    void shouldThrowExceptionWhenEmailAlreadyExists() {
+    void shouldNotRegisterUserWhenEmailAlreadyExists() {
 
-        when(userRepository.existsByEmail(registerRequest.email()))
+        when(userRepository.existsByEmail(request.email()))
                 .thenReturn(true);
 
         assertThrows(
                 UserAlreadyExistsException.class,
-                () -> authService.register(registerRequest)
+                () -> authService.register(request)
         );
 
         verify(userRepository, never()).save(any(User.class));
@@ -96,7 +97,7 @@ class AuthServiceTest {
     }
 
     @Test
-    void shouldLoginSuccessfully() {
+    void shouldLoginUser() {
 
         LoginRequest loginRequest = new LoginRequest(
                 "john@example.com",
@@ -117,7 +118,7 @@ class AuthServiceTest {
                 "encodedPassword"
         );
 
-        when(userRepository.findByEmail("john@example.com"))
+        when(userRepository.findByEmail(loginRequest.email()))
                 .thenReturn(Optional.of(user));
 
         UserResponse response = authService.login(loginRequest);
@@ -126,15 +127,12 @@ class AuthServiceTest {
         assertEquals("John Doe", response.name());
         assertEquals("john@example.com", response.email());
 
-        verify(authenticationManager)
-                .authenticate(any());
-
-        verify(userRepository)
-                .findByEmail("john@example.com");
+        verify(authenticationManager).authenticate(any());
+        verify(userRepository).findByEmail(loginRequest.email());
     }
 
     @Test
-    void shouldThrowExceptionWhenCredentialsAreInvalid() {
+    void shouldThrowExceptionForInvalidCredentials() {
 
         LoginRequest loginRequest = new LoginRequest(
                 "john@example.com",

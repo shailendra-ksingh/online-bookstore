@@ -25,37 +25,39 @@ class BookServiceTest {
     @InjectMocks
     private BookService bookService;
 
-    @Test
-    void shouldReturnAllBooks() {
 
-        Book cleanCode = new Book(
+    @Test
+    void getAllBooks_shouldReturnBooks() {
+
+        Book book1 = new Book(
                 "Clean Code",
                 "Robert C. Martin",
                 BigDecimal.valueOf(500)
         );
 
-        Book effectiveJava = new Book(
+        Book book2 = new Book(
                 "Effective Java",
                 "Joshua Bloch",
                 BigDecimal.valueOf(700)
         );
 
         when(bookRepository.findAll())
-                .thenReturn(List.of(cleanCode, effectiveJava));
+                .thenReturn(List.of(book1, book2));
 
         List<BookResponse> books = bookService.getAllBooks();
 
         assertNotNull(books);
         assertEquals(2, books.size());
+
         assertEquals("Clean Code", books.get(0).title());
         assertEquals("Effective Java", books.get(1).title());
     }
 
-    @Test
-    void shouldReturnEmptyListWhenNoBooksExist() {
 
-        when(bookRepository.findAll())
-                .thenReturn(List.of());
+    @Test
+    void getAllBooks_shouldReturnEmptyList() {
+
+        when(bookRepository.findAll()).thenReturn(List.of());
 
         List<BookResponse> books = bookService.getAllBooks();
 
@@ -63,8 +65,9 @@ class BookServiceTest {
         assertTrue(books.isEmpty());
     }
 
+
     @Test
-    void shouldMapBookEntityToBookResponseCorrectly() {
+    void getAllBooks_shouldMapBookToResponse() {
 
         Book book = new Book(
                 "Clean Architecture",
@@ -74,11 +77,13 @@ class BookServiceTest {
 
         ReflectionTestUtils.setField(book, "id", 1L);
 
-        when(bookRepository.findAll())
-                .thenReturn(List.of(book));
+        when(bookRepository.findAll()).thenReturn(List.of(book));
 
-        BookResponse response =
-                bookService.getAllBooks().get(0);
+        List<BookResponse> books = bookService.getAllBooks();
+
+        assertEquals(1, books.size());
+
+        BookResponse response = books.get(0);
 
         assertEquals(1L, response.id());
         assertEquals("Clean Architecture", response.title());

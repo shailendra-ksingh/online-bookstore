@@ -3,19 +3,18 @@ package com.bookstore.service;
 import com.bookstore.dto.cart.CartItemResponse;
 import com.bookstore.dto.cart.CartResponse;
 import com.bookstore.dto.order.OrderResponse;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import static org.mockito.Mockito.verify;
 
 import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -27,29 +26,20 @@ class OrderServiceTest {
     @InjectMocks
     private OrderService orderService;
 
-    private CartResponse cartResponse;
-
-    @BeforeEach
-    void setUp() {
-        cartResponse = new CartResponse(
-                Collections.emptyList(),
-                BigDecimal.ZERO
-        );
-    }
 
     @Test
     void shouldCreateOrderSuccessfully() {
 
+        CartItemResponse cartItem = new CartItemResponse(
+                1L,
+                "Clean Code",
+                new BigDecimal("500.00"),
+                2,
+                new BigDecimal("1000.00")
+        );
+
         CartResponse cart = new CartResponse(
-                List.of(
-                        new CartItemResponse(
-                                1L,
-                                "Clean Code",
-                                new BigDecimal("500.00"),
-                                2,
-                                new BigDecimal("1000.00")
-                        )
-                ),
+                List.of(cartItem),
                 new BigDecimal("1000.00")
         );
 
@@ -64,16 +54,21 @@ class OrderServiceTest {
         verify(cartService).clearCart();
     }
 
+
     @Test
-    void shouldThrowExceptionWhenCartIsEmpty() {
+    void shouldNotCreateOrderForEmptyCart() {
 
-        when(cartService.getCart()).thenReturn(cartResponse);
+        CartResponse emptyCart = new CartResponse(
+                Collections.emptyList(),
+                BigDecimal.ZERO
+        );
 
-        IllegalStateException exception =
-                assertThrows(
-                        IllegalStateException.class,
-                        () -> orderService.createOrder()
-                );
+        when(cartService.getCart()).thenReturn(emptyCart);
+
+        IllegalStateException exception = assertThrows(
+                IllegalStateException.class,
+                () -> orderService.createOrder()
+        );
 
         assertEquals(
                 "Cannot create order because cart is empty",
@@ -81,19 +76,20 @@ class OrderServiceTest {
         );
     }
 
+
     @Test
-    void shouldGenerateUniqueOrderIds() {
+    void shouldGenerateDifferentOrderIds() {
+
+        CartItemResponse cartItem = new CartItemResponse(
+                1L,
+                "Spring Boot In Action",
+                new BigDecimal("700.00"),
+                1,
+                new BigDecimal("700.00")
+        );
 
         CartResponse cart = new CartResponse(
-                List.of(
-                        new CartItemResponse(
-                                1L,
-                                "Spring Boot In Action",
-                                new BigDecimal("700.00"),
-                                1,
-                                new BigDecimal("700.00")
-                        )
-                ),
+                List.of(cartItem),
                 new BigDecimal("700.00")
         );
 
