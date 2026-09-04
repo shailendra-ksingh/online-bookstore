@@ -3,7 +3,6 @@ import { useCart } from "../context/useCart";
 import { createOrder } from "../api/orderApi";
 
 function CheckoutPage({ onBackToCart, onOrderPlaced }) {
-
     const {
         cartItems,
         cartTotal,
@@ -15,7 +14,6 @@ function CheckoutPage({ onBackToCart, onOrderPlaced }) {
     const [error, setError] = useState("");
 
     const handlePlaceOrder = async () => {
-
         if (cartItems.length === 0) {
             setError("Your cart is empty.");
             return;
@@ -27,18 +25,13 @@ function CheckoutPage({ onBackToCart, onOrderPlaced }) {
         try {
             const order = await createOrder();
 
-            try {
-                await loadCart();
-            } catch (cartError) {
-                console.error("Failed to refresh cart", cartError);
-            }
+            // Reload the cart since checkout clears it on the backend.
+            await loadCart();
 
             onOrderPlaced(order);
-
         } catch (error) {
             console.error("Failed to place order", error);
             setError("Unable to place order. Please try again.");
-
         } finally {
             setIsPlacingOrder(false);
         }
@@ -56,9 +49,7 @@ function CheckoutPage({ onBackToCart, onOrderPlaced }) {
 
     return (
         <div className="checkout-page">
-
             <div className="checkout-container">
-
                 <h1>Order Summary</h1>
 
                 {error && (
@@ -68,9 +59,7 @@ function CheckoutPage({ onBackToCart, onOrderPlaced }) {
                 )}
 
                 {cartItems.length === 0 ? (
-
                     <div className="empty-cart">
-
                         <p>Your cart is empty.</p>
 
                         <button
@@ -80,19 +69,14 @@ function CheckoutPage({ onBackToCart, onOrderPlaced }) {
                         >
                             Back to Cart
                         </button>
-
                     </div>
-
                 ) : (
-
                     <>
                         {cartItems.map((item) => (
-
                             <div
                                 className="checkout-item"
                                 key={item.bookId}
                             >
-
                                 <h3>{item.title}</h3>
 
                                 <p>
@@ -104,15 +88,13 @@ function CheckoutPage({ onBackToCart, onOrderPlaced }) {
                                 </p>
 
                                 <p>
-                                    Item Total: {Number(item.itemTotal).toFixed(2)}
+                                    Item Total:{" "}
+                                    {Number(item.itemTotal).toFixed(2)}
                                 </p>
-
                             </div>
-
                         ))}
 
                         <div className="checkout-summary">
-
                             <h2>
                                 Total: {Number(cartTotal).toFixed(2)}
                             </h2>
@@ -135,14 +117,10 @@ function CheckoutPage({ onBackToCart, onOrderPlaced }) {
                                     ? "Placing Order..."
                                     : "Place Order"}
                             </button>
-
                         </div>
                     </>
-
                 )}
-
             </div>
-
         </div>
     );
 }

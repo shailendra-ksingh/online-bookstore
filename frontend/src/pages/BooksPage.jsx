@@ -1,10 +1,12 @@
 import { useEffect, useState } from "react";
 import { getBooks } from "../api/bookApi";
+import { useCart } from "../context/useCart";
 import BookCard from "../components/book/BookCard";
 
 
 function BooksPage() {
 
+    const { error: cartError } = useCart();
     const [books, setBooks] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
@@ -72,18 +74,22 @@ function BooksPage() {
 
             <h1>Online Bookstore</h1>
 
-            <div className="books-list">
+            <>
+                {cartError && (
+                    <p className="error-message">
+                        {cartError}
+                    </p>
+                )}
 
-                {books.map((book) => (
-
-                    <BookCard
-                        key={book.id}
-                        book={book}
-                    />
-
-                ))}
-
-            </div>
+                <div className="books-list">
+                    {books.map((book) => (
+                        <BookCard
+                            key={book.id}
+                            book={book}
+                        />
+                    ))}
+                </div>
+            </>
 
         </div>
     );

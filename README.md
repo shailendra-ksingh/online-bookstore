@@ -120,55 +120,62 @@ online-bookstore
 
 - Java 17
 - Maven
-- Node.js
-- npm
+- Node.js and npm
 
-### Backend
+### 1. Start the Backend
+
+Open a terminal and run:
 
 ```
 cd online-bookstore\backend
-mvn clean test
 mvn spring-boot:run
-```
+````
 
-Backend URL:
+The backend starts at:
 
 ```text
 http://localhost:8080
 ```
 
-### Frontend
+To run backend tests:
+
+```
+mvn clean test
+```
+
+### 2. Start the Frontend
+
+Open another terminal and run:
 
 ```powershell
 cd online-bookstore\frontend
 ```
 
-Configure a `.env` file:
+Configure/verify a `.env` file with:
 
 ```text
 VITE_API_URL=http://localhost:8080/api/v1
 ```
 
-Run:
+Then install dependencies and start the application:
 
 ```powershell
 npm install
 npm run dev
 ```
 
-Frontend URL:
+Open the application at:
 
 ```text
 http://localhost:5173
 ```
 
-### Frontend Checks
+### Optional Frontend Checks
 
 ```powershell
 npm run lint
 npm run build
 ```
-
 ---
 
 ## API Endpoints
@@ -177,6 +184,19 @@ Base URL:
 
 ```text
 http://localhost:8080/api/v1
+```
+
+## HTTP Status Codes
+
+The API uses appropriate HTTP status codes, including:
+
+```text
+200 OK
+201 Created
+400 Bad Request
+401 Unauthorized
+404 Not Found
+500 Internal Server Error
 ```
 
 ### Authentication
@@ -264,14 +284,62 @@ Data is reset when the application restarts.
 
 ---
 
+## Code Quality, Separation of Concerns
+
+The project follows common clean code and design practices to keep the application easy to understand and maintain.
+
+Frontend and backend responsibilities are clearly separated.
+
+On the backend:
+
+- Controllers handle HTTP requests and responses.
+- Services contain the business logic.
+- Repositories handle database access.
+- DTOs are used for API request and response models.
+- Exception handling is centralized using `@RestControllerAdvice`.
+
+On the frontend:
+
+- Pages focus on UI and user interactions.
+- Context manages shared application state such as authentication and cart data.
+- API modules handle communication with backend endpoints.
+- Reusable components are kept separate from page-level logic.
+
+### SOLID Principles
+
+SOLID principles are applied where appropriate without adding unnecessary abstractions.
+
+- Classes and components have focused responsibilities. For example, `CartService` handles cart operations, while `OrderService` handles order creation.
+- Dependencies are injected using constructor injection, keeping components loosely coupled and easier to test.
+- The layered structure makes it easier to add new features without heavily affecting unrelated parts of the application.
+
+### Good Practices
+
+- Meaningful and consistent naming
+- Small, focused methods
+- Constructor-based dependency injection
+- DTOs instead of exposing entities directly
+- Centralized exception handling
+- Request validation on the backend
+- Error handling on both frontend and backend
+- Reusable React components
+- React Context for shared state
+- API communication separated from UI components
+- Password hashing using BCrypt
+- Environment-based configuration for API URL and CORS settings
+
+---
+
 ## Assumptions and Trade-offs
 
 This project was developed as a time-boxed technical assignment, with the focus on delivering the core bookstore workflow while keeping the implementation simple and maintainable.
 
 - The cart is stored in memory and is not associated with individual users.
 - Orders are created from the current cart but are not persisted.
-- Registration and login are implemented, but JWT-based authorization is outside the current scope.
-- No payment, admin, search, filtering, or pagination features are included.
+- Basic user authentication (registration and login) is implemented as part of the assignment scope.
+- JWT-based authorization or OAuth authentication is not included in the current scope.
+- Payment processing, admin functionality, search, filtering, and pagination are not included.
+- Transaction management is not implemented
 - H2 is used as an in-memory database, so data is reset when the application restarts.
 
 Passwords are hashed using BCrypt before being stored and are never stored in local storage.
@@ -279,5 +347,3 @@ Passwords are hashed using BCrypt before being stored and are never stored in lo
 In a production application, cart and order data would be persisted, associated with authenticated users, and protected using a more complete authorization mechanism.
 
 ---
-
-## 
