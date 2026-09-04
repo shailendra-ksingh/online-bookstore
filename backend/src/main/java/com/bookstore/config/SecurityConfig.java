@@ -26,9 +26,9 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
-        http
-                .cors(Customizer.withDefaults())
-                // csrf disabled to avoid REST call getting 403 (Forbidden error)
+        http.cors(Customizer.withDefaults())
+                // CSRF is disabled because the application currently exposes REST APIs
+                // and does not use session-based authentication.
                 .csrf(AbstractHttpConfigurer::disable)
                 // needed for H2 console access
                 .headers(headers ->

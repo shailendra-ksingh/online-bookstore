@@ -7,6 +7,7 @@ import com.bookstore.entity.Book;
 import com.bookstore.exception.BookNotFoundException;
 import com.bookstore.exception.CartItemNotFoundException;
 import com.bookstore.repository.BookRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -16,17 +17,14 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Service
+@RequiredArgsConstructor
 public class CartService {
 
     private final BookRepository bookRepository;
 
-    // Keeping the cart in memory for this assignment.
-    // In a real application, it would normally be stored per user.
+    // In-memory cart used for the assignment.
+    // A production application need to persist cart data per user.
     private final Map<Long, Integer> cartItems = new ConcurrentHashMap<>();
-
-    public CartService(BookRepository bookRepository) {
-        this.bookRepository = bookRepository;
-    }
 
     public CartResponse addToCart(AddToCartRequest request) {
 
@@ -71,10 +69,7 @@ public class CartService {
 
     public CartResponse updateQuantity(Long bookId, Integer quantity) {
 
-        if (!cartItems.containsKey(bookId)) {
-            throw new CartItemNotFoundException(bookId);
-        }
-
+        validateCartItem(bookId);
         cartItems.put(bookId, quantity);
 
         return getCart();
@@ -82,13 +77,16 @@ public class CartService {
 
     public CartResponse removeFromCart(Long bookId) {
 
-        if (!cartItems.containsKey(bookId)) {
-            throw new CartItemNotFoundException(bookId);
-        }
-
+        validateCartItem(bookId);
         cartItems.remove(bookId);
 
         return getCart();
+    }
+
+    private void validateCartItem(Long bookId) {
+        if (!cartItems.containsKey(bookId)) {
+            throw new CartItemNotFoundException(bookId);
+        }
     }
 
     public void clearCart() {

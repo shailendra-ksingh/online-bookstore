@@ -2,11 +2,13 @@ package com.bookstore.service;
 
 import com.bookstore.dto.cart.CartResponse;
 import com.bookstore.dto.order.OrderResponse;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.concurrent.atomic.AtomicLong;
 
 @Service
+@RequiredArgsConstructor
 public class OrderService {
 
     private final CartService cartService;
@@ -14,10 +16,6 @@ public class OrderService {
     // Using an in-memory sequence for order IDs in this assignment.
     // Normally, orders and their IDs would come from the database.
     private final AtomicLong orderSequence = new AtomicLong(1000);
-
-    public OrderService(CartService cartService) {
-        this.cartService = cartService;
-    }
 
     public OrderResponse createOrder() {
 
@@ -37,7 +35,7 @@ public class OrderService {
                 "CONFIRMED"
         );
 
-        // Order is created successfully, so clear the current cart.
+        // Order is created, so clear the current cart.
         cartService.clearCart();
 
         return orderResponse;
