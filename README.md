@@ -202,7 +202,6 @@ online-bookstore
 ## Frontend
 
 * React
-* Vite
 * JavaScript
 * Axios
 * HTML/CSS
@@ -272,8 +271,6 @@ Handles:
 * Update quantity
 * Remove item
 * Refresh cart
-
-This keeps shared application state separate from individual page components.
 
 ---
 
@@ -388,53 +385,39 @@ http://localhost:8080
 
 # Frontend Setup
 
-Open another terminal and navigate to the frontend folder:
+Open a new terminal and go to the frontend folder:
 
 ```powershell
 cd online-bookstore\frontend
-```
+````
 
-Create a `.env` file in the frontend root directory:
+URL in a `.env` file:
 
 ```text
 VITE_API_URL=http://localhost:8080/api/v1
 ```
 
-Install dependencies:
+Install dependencies and start the application:
 
 ```powershell
 npm install
-```
-
-Start the application:
-
-```powershell
 npm run dev
 ```
 
-The frontend normally runs at:
+The frontend runs at:
 
 ```text
 http://localhost:5173
 ```
-
-If port `5173` is already in use, Vite may use another available port.
-
 ---
 
-# Frontend Quality Checks
+# Frontend Checks
 
-Run ESLint:
-
-```powershell
-npm run lint
 ```
-
-Create a production build:
-
-```powershell
+npm run lint
 npm run build
 ```
+
 ---
 
 # API Endpoints
@@ -447,15 +430,13 @@ http://localhost:8080/api/v1
 
 ---
 
-## Authentication
+### Authentication
 
-### Register User
+**Register**
 
 ```http
 POST /auth/register
 ```
-
-Example request:
 
 ```json
 {
@@ -465,21 +446,11 @@ Example request:
 }
 ```
 
-A successful registration returns:
-
-```text
-201 Created
-```
-
----
-
-### Login
+**Login**
 
 ```http
 POST /auth/login
 ```
-
-Example request:
 
 ```json
 {
@@ -488,46 +459,28 @@ Example request:
 }
 ```
 
-Invalid credentials return:
-
-```text
-401 Unauthorized
-```
-
 ---
 
-## Books
-
-### Get Books
+### Books
 
 ```http
 GET /books
 ```
 
-Example response:
-
-```json
-[
-  {
-    "id": 1,
-    "title": "Clean Code",
-    "author": "Robert C. Martin",
-    "price": 500.00
-  }
-]
-```
+Returns the list of available books.
 
 ---
 
-## Cart
+### Cart
 
-### Add Book to Cart
+| Action | Endpoint |
+|---|---|
+| Get cart | `GET /cart` |
+| Add book | `POST /cart` |
+| Update quantity | `PUT /cart/{bookId}` |
+| Remove book | `DELETE /cart/{bookId}` |
 
-```http
-POST /cart
-```
-
-Example request:
+Example add request:
 
 ```json
 {
@@ -538,76 +491,13 @@ Example request:
 
 ---
 
-### Get Cart
-
-```http
-GET /cart
-```
-
-Example response:
-
-```json
-{
-  "items": [
-    {
-      "bookId": 1,
-      "title": "Clean Code",
-      "price": 500.00,
-      "quantity": 2,
-      "itemTotal": 1000.00
-    }
-  ],
-  "total": 1000.00
-}
-```
-
----
-
-### Update Cart Quantity
-
-```http
-PUT /cart/{bookId}
-```
-
-Example:
-
-```http
-PUT /cart/1
-```
-
-Request:
-
-```json
-{
-  "quantity": 3
-}
-```
-
----
-
-### Remove Cart Item
-
-```http
-DELETE /cart/{bookId}
-```
-
-Example:
-
-```http
-DELETE /cart/1
-```
-
----
-
-## Orders
-
-### Create Order
+### Orders
 
 ```http
 POST /orders
 ```
 
-The order is created using the current cart.
+Creates an order from the current cart. After a successful order, the cart is cleared.
 
 Example response:
 
@@ -619,52 +509,28 @@ Example response:
 }
 ```
 
-After a successful order:
-
-1. The current cart is read.
-2. The order response is created.
-3. The backend cart is cleared.
-4. The frontend refreshes its cart state.
-5. The user sees the order confirmation.
-
----
-
 # Validation and Error Handling
 
-Request validation is implemented using Bean Validation annotations.
+Input validation is handled using Bean Validation for fields such as email, password, book ID, and quantity.
 
-Examples include:
+Invalid requests return meaningful error messages.
 
-* Required fields
-* Valid email format
-* Password length validation
-* Required book ID
-* Positive book ID
-* Quantity greater than zero
+## Exception Handling
 
-Invalid requests return meaningful validation errors.
-
----
-
-## Centralized Exception Handling
-
-Exception handling is centralized using:
+Exceptions are handled centrally using:
 
 ```java
 @RestControllerAdvice
-```
+````
 
-The application handles scenarios such as:
+This handles cases like:
 
-* Book not found
-* Cart item not found
+* Book or cart item not found
 * User already exists
-* Invalid login credentials
-* Request validation errors
+* Invalid login
+* Validation errors
 * Empty cart during checkout
-* Unexpected server errors
-
-This avoids repeating exception handling code across controllers and keeps error responses consistent.
+* Unexpected errors
 
 ---
 
@@ -672,54 +538,15 @@ This avoids repeating exception handling code across controllers and keeps error
 
 Spring Security is configured for the application.
 
-Passwords are never stored as plain text.
+Passwords are encrypted using `BCryptPasswordEncoder` and are never returned in API responses.
 
-`BCryptPasswordEncoder` is used to hash passwords before storing them in the database.
-
-Passwords are also not returned in API responses.
-
-The application currently supports registration and login, but JWT or session-based API authorization is outside the scope of this assignment.
-
-In a production application, protected endpoints would normally use JWT, OAuth2, or another secure authentication mechanism.
+Registration and login are implemented. JWT-based authorization is outside the scope of this assignment.
 
 ---
 
 # Testing
 
-The backend includes tests for important business logic and common edge cases.
-
-The test coverage includes areas such as:
-
-### Authentication
-
-* Successful registration
-* Duplicate email handling
-* Successful login
-* Invalid credentials
-
-### Books
-
-* Fetching available books
-* Empty book list
-* Entity to DTO mapping
-
-### Cart
-
-* Adding books
-* Increasing quantity
-* Updating quantity
-* Removing items
-* Calculating totals
-* Missing book scenarios
-* Updating a cart item that does not exist
-
-### Orders
-
-* Successful order creation
-* Empty cart validation
-* Order ID generation
-
-Run all backend tests using:
+Run tests:
 
 ```powershell
 mvn clean test
@@ -729,11 +556,7 @@ mvn clean test
 
 # Code Quality
 
-The project follows a few clean coding principles.
-
-## Clean and Readable Code
-
-The code uses meaningful names and tries to keep methods focused on one responsibility.
+The project uses meaningful names and keeps methods focused on their responsibilities.
 
 Examples:
 
@@ -742,13 +565,10 @@ addToCart()
 updateQuantity()
 removeFromCart()
 createOrder()
-loadCart()
-handlePlaceOrder()
+
 ```
 
-The intention is to make most of the code understandable without requiring excessive comments.
-
-Comments are mainly used for important decisions or non-obvious implementation details.
+Comments are used only where they help explain important decisions or non-obvious logic.
 
 ---
 
@@ -783,7 +603,7 @@ DELETE  /cart/{bookId}
 POST    /orders
 ```
 
-Appropriate HTTP status codes are used for common scenarios such as:
+The API uses HTTP status codes :
 
 ```text
 200 OK
@@ -791,194 +611,118 @@ Appropriate HTTP status codes are used for common scenarios such as:
 400 Bad Request
 401 Unauthorized
 404 Not Found
-409 Conflict
 500 Internal Server Error
-```
+````
 
 ---
 
 # Configuration
 
-The frontend API URL is configured using an environment variable:
+The frontend API URL is configured using:
 
 ```text
 VITE_API_URL
 ```
 
-The backend CORS origin is configured through application properties:
+The backend CORS origin is configured through:
 
 ```properties
 app.cors.allowed-origin
 ```
-
-Keeping these values outside the main application logic makes configuration changes easier across environments.
-
 ---
 
 # Database
 
-The application uses an H2 in-memory database.
+The application uses an H2 in-memory database, so no external database setup is required.
 
-H2 was chosen because it keeps the project easy to run without requiring an external database installation.
-
-The database is recreated when the application restarts.
-
-For a production application, PostgreSQL or MySQL would be more suitable.
+The data is reset when the application restarts. A production application would typically use PostgreSQL or MySQL.
 
 ---
 
 # Assumptions and Trade-offs
 
-This project was developed as a time-boxed technical assignment.
+This was developed as a time-boxed technical assignment, so the focus was on keeping the required functionality simple and maintainable.
 
-The main goal was to implement the required application flow while keeping the code simple and maintainable.
+* The cart is stored in memory rather than being linked to individual users.
+* Orders are created from the current cart but are not persisted.
+* Registration and login are implemented, but JWT-based authorization is outside the current scope.
+* Passwords are hashed using BCrypt and are never stored in local storage.
 
-Some production-level features were intentionally kept outside the current scope.
-
----
-
-## In-Memory Cart
-
-The shopping cart is currently stored in memory.
-
-This keeps the cart implementation straightforward for the assignment.
-
-In a production application, cart data would normally be persisted and associated with an authenticated user.
-
----
-
-## Simplified Order Processing
-
-Orders are currently not persisted in the database.
-
-The order flow is:
-
-1. Get the current cart.
-2. Validate that the cart is not empty.
-3. Create an order response.
-4. Clear the cart.
-
-A production implementation would normally have `Order` and `OrderItem` entities stored in a database.
-
----
-
-## Authentication Scope
-
-User registration and login are implemented.
-
-Passwords are securely hashed in the backend using BCrypt.
-
-JWT or session-based authorization is not implemented as part of the current assignment.
-
-The frontend stores basic user information only to maintain UI login state. Passwords are never stored in local storage.
+In a production application, carts and orders need tp be persisted and associated with authenticated users.
 
 ---
 
 # Known Limitations
 
-The current implementation intentionally has the following limitations:
+To keep the assignment focused, a few features are outside the current scope:
 
-* Cart data is stored in memory.
-* Cart data is not associated with individual users.
-* Orders are not persisted.
-* No payment gateway is implemented.
-* JWT or token-based authorization is not implemented.
-* No admin functionality is included.
-* Book create, update, and delete APIs are not included.
-* Search, filtering, and pagination are not implemented.
-* H2 data is lost when the application restarts.
-
-These limitations were kept outside the scope so the project could focus on the main bookstore flow.
+- Cart is stored in memory and not linked to users.
+- Orders are not persisted.
+- No payment or admin functionality.
+- No JWT-based authorization.
+- No book management, search, filtering, or pagination.
+- H2 data is lost when the application restarts.
 
 ---
 
-# Possible Future Improvements
+# Future Improvements
 
 ```text
-Current Implementation              Possible Improvement
-----------------------------------------------------------------
-H2 database                         PostgreSQL / MySQL
-In-memory cart                      Persistent user-specific cart
-In-memory order                     Order and OrderItem entities
-Basic login                         JWT / OAuth2 authorization
-No payment                          Payment gateway integration
-No inventory                        Inventory management
-No pagination                       Pagination and filtering
-Basic logging                       Monitoring and structured logging
-```
+H2 Database          → Oracle/PostgreSQL
+In-memory Cart       → Persistent user cart
+In-memory Orders     → Order and OrderItem entities
+Basic Login          → JWT authorization
+No Payment           → Payment integration
+No Pagination        → Pagination and filtering
+````
 
-The existing separation between controllers, services, repositories, DTOs, frontend contexts, and API modules provides a good base for these improvements.
+The current structure provides a base for adding these features later.
 
 ---
 
 # Application Flow
 
-The main user journey is:
-
 ```text
 Register
-   |
-   v
+   ↓
 Login
-   |
-   v
-View Available Books
-   |
-   v
-Add Books to Cart
-   |
-   v
-Update / Remove Cart Items
-   |
-   v
+   ↓
+View Books
+   ↓
+Add to Cart
+   ↓
+Update / Remove Items
+   ↓
 Checkout
-   |
-   v
-Review Order Summary
-   |
-   v
+   ↓
 Place Order
-   |
-   v
+   ↓
 Order Confirmation
 ```
 
 ---
 
-# Git and Project Setup
+# Project Setup
 
-The repository includes a `.gitignore` configuration to avoid committing generated and environment-specific files such as:
-
-* `node_modules`
-* Build output
-* IDE configuration files
-* Environment files
-* Compiled application files
-
-The project structure keeps frontend and backend code independent, making changes easier to manage and reducing unnecessary coupling between unrelated parts of the application.
+Frontend and backend are kept separate for easier maintenance.
 
 ---
 
 # Summary
 
-This project demonstrates a frontend-to-backend application flow using React and Spring Boot.
+This project demonstrates a bookstore flow using React and Spring Boot.
 
 It includes:
 
-* Clean project structure
 * Layered backend architecture
-* Separation of concerns
-* Constructor-based dependency injection
-* DTO-based request and response models
-* Spring Data JPA repositories
+* REST APIs and DTOs
 * Centralized exception handling
-* RESTful API design
-* Spring Security configuration
-* BCrypt password encryption
+* Password encryption
 * React Context for shared state
-* Reusable React components
-* Centralized Axios API communication
+* Reusable components
+* Centralized API communication
+* Unit tests for core business logic
 
-The implementation focuses on the core requirements while keeping the code readable, modular, and easy to extend.
+The focus was on building the main functionality while keeping the code simple, readable, and maintainable.
 
 ```

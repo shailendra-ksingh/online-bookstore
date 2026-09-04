@@ -28,13 +28,14 @@ public class SecurityConfig {
 
         http
                 .cors(Customizer.withDefaults())
+                // csrf disabled to avoid REST call getting 403 (Forbidden error)
                 .csrf(AbstractHttpConfigurer::disable)
-
-                // Required for H2 console access
+                // needed for H2 console access
                 .headers(headers ->
                         headers.frameOptions(frameOptions ->
                                 frameOptions.disable()))
-
+                // as per kata statement, basic user authentication (login and registration) APIs
+                // other APIs are unauthenticated
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
                                 "/api/v1/auth/**",

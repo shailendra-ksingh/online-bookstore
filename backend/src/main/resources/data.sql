@@ -1,16 +1,16 @@
--- Sample books loaded when the application starts.
+-- Initial bookstore catalog.
 
 INSERT INTO books (title, author, price)
-VALUES ('Clean Code', 'Robert C. Martin', 500.00);
+VALUES ('The Pragmatic Programmer', 'Andrew Hunt', 650.00);
 
 INSERT INTO books (title, author, price)
-VALUES ('Effective Java', 'Joshua Bloch', 700.00);
+VALUES ('Head First Design Patterns', 'Eric Freeman', 720.00);
 
 INSERT INTO books (title, author, price)
-VALUES ('Spring in Action', 'Craig Walls', 800.00);
+VALUES ('Atomic Habits', 'James Clear', 499.00);
 
 INSERT INTO books (title, author, price)
-VALUES ('Java Concurrency in Practice', 'Brian Goetz', 750.00);
+VALUES ('Deep Work', 'Cal Newport', 550.00);
 
 INSERT INTO books (title, author, price)
-VALUES ('Designing Data-Intensive Applications', 'Martin Kleppmann', 900.00);
+VALUES ('The Psychology of Money', 'Morgan Housel', 450.00);
