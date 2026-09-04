@@ -1,9 +1,7 @@
 import { useState } from "react";
 import { registerUser } from "../api/authApi";
 
-
 function RegisterPage({ onRegistrationComplete }) {
-
     const [form, setForm] = useState({
         name: "",
         email: "",
@@ -14,9 +12,7 @@ function RegisterPage({ onRegistrationComplete }) {
     const [success, setSuccess] = useState("");
     const [loading, setLoading] = useState(false);
 
-
     const handleChange = (event) => {
-
         const { name, value } = event.target;
 
         setForm((previousForm) => ({
@@ -25,9 +21,7 @@ function RegisterPage({ onRegistrationComplete }) {
         }));
     };
 
-
     const getErrorMessage = (error) => {
-
         const errorData = error.response?.data;
 
         // Sometimes the backend sends the error directly as text.
@@ -45,9 +39,7 @@ function RegisterPage({ onRegistrationComplete }) {
         );
     };
 
-
     const handleSubmit = async (event) => {
-
         event.preventDefault();
 
         setError("");
@@ -55,48 +47,34 @@ function RegisterPage({ onRegistrationComplete }) {
         setLoading(true);
 
         try {
-
             await registerUser({
                 name: form.name.trim(),
                 email: form.email.trim(),
                 password: form.password
             });
 
-            setSuccess(
-                "Registration successful. Please login."
-            );
+            setSuccess("Registration successful. Please login.");
 
             setForm({
                 name: "",
                 email: "",
                 password: ""
             });
-
         } catch (error) {
-
             setError(getErrorMessage(error));
-
         } finally {
-
             setLoading(false);
         }
     };
 
-
     return (
         <div className="auth-page">
-
             <div className="auth-container">
-
                 <div className="auth-card">
-
                     <h1>Create Account</h1>
 
-
                     {success ? (
-
                         <div className="success-section">
-
                             <p className="success-message">
                                 {success}
                             </p>
@@ -107,15 +85,10 @@ function RegisterPage({ onRegistrationComplete }) {
                             >
                                 Go to Login
                             </button>
-
                         </div>
-
                     ) : (
-
                         <form onSubmit={handleSubmit}>
-
                             <div className="form-group">
-
                                 <label htmlFor="name">
                                     Name
                                 </label>
@@ -129,12 +102,9 @@ function RegisterPage({ onRegistrationComplete }) {
                                     autoComplete="name"
                                     required
                                 />
-
                             </div>
 
-
                             <div className="form-group">
-
                                 <label htmlFor="email">
                                     Email
                                 </label>
@@ -148,12 +118,9 @@ function RegisterPage({ onRegistrationComplete }) {
                                     autoComplete="email"
                                     required
                                 />
-
                             </div>
 
-
                             <div className="form-group">
-
                                 <label htmlFor="password">
                                     Password
                                 </label>
@@ -168,9 +135,7 @@ function RegisterPage({ onRegistrationComplete }) {
                                     minLength={8}
                                     required
                                 />
-
                             </div>
-
 
                             {error && (
                                 <p
@@ -181,7 +146,6 @@ function RegisterPage({ onRegistrationComplete }) {
                                 </p>
                             )}
 
-
                             <button
                                 type="submit"
                                 disabled={loading}
@@ -190,17 +154,12 @@ function RegisterPage({ onRegistrationComplete }) {
                                     ? "Creating account..."
                                     : "Register"}
                             </button>
-
                         </form>
                     )}
-
                 </div>
-
             </div>
-
         </div>
     );
 }
-
 
 export default RegisterPage;

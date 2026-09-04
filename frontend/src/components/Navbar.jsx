@@ -6,11 +6,8 @@ function Navbar({
                 }) {
     return (
         <div className="navbar">
-
             <h2>Online Bookstore</h2>
-
             <div className="nav-actions">
-
                 {showCartButton && (
                     <button
                         type="button"
@@ -19,16 +16,13 @@ function Navbar({
                         Cart ({cartCount})
                     </button>
                 )}
-
                 <button
                     type="button"
                     onClick={onLogout}
                 >
                     Logout
                 </button>
-
             </div>
-
         </div>
     );
 }

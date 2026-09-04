@@ -1,8 +1,6 @@
 import { useCart } from "../context/useCart";
 
-
 function CartPage({ onContinueShopping, onCheckout }) {
-
     const {
         cartItems,
         cartTotal,
@@ -13,32 +11,21 @@ function CartPage({ onContinueShopping, onCheckout }) {
         removeFromCart
     } = useCart();
 
-
     if (loading && cartItems.length === 0) {
-
         return (
             <div className="cart-page">
-
                 <div className="cart-container">
-
                     <h1>Shopping Cart</h1>
-
                     <p>Loading cart...</p>
-
                 </div>
-
             </div>
         );
     }
 
-
     return (
         <div className="cart-page">
-
             <div className="cart-container">
-
                 <h1>Shopping Cart</h1>
-
 
                 {error && (
                     <p
@@ -49,16 +36,12 @@ function CartPage({ onContinueShopping, onCheckout }) {
                     </p>
                 )}
 
-
                 {loading && cartItems.length > 0 && (
                     <p>Updating cart...</p>
                 )}
 
-
                 {cartItems.length === 0 ? (
-
                     <div className="empty-cart">
-
                         <p>Your cart is empty.</p>
 
                         <button
@@ -68,31 +51,21 @@ function CartPage({ onContinueShopping, onCheckout }) {
                         >
                             Continue Shopping
                         </button>
-
                     </div>
-
                 ) : (
-
                     <>
-
                         {cartItems.map((item) => (
-
                             <div
                                 className="cart-item"
                                 key={item.bookId}
                             >
-
                                 <h3>{item.title}</h3>
 
-
                                 <p>
-                                    Price: 
-                                    {Number(item.price).toFixed(2)}
+                                    Price: {Number(item.price).toFixed(2)}
                                 </p>
 
-
                                 <div className="quantity-controls">
-
                                     <button
                                         type="button"
                                         aria-label={`Decrease quantity of ${item.title}`}
@@ -107,11 +80,7 @@ function CartPage({ onContinueShopping, onCheckout }) {
                                         -
                                     </button>
 
-
-                                    <span>
-                                        {item.quantity}
-                                    </span>
-
+                                    <span>{item.quantity}</span>
 
                                     <button
                                         type="button"
@@ -123,15 +92,12 @@ function CartPage({ onContinueShopping, onCheckout }) {
                                     >
                                         +
                                     </button>
-
                                 </div>
 
-
                                 <p>
-                                    Item Total: 
+                                    Item Total:{" "}
                                     {Number(item.itemTotal).toFixed(2)}
                                 </p>
-
 
                                 <button
                                     type="button"
@@ -143,22 +109,15 @@ function CartPage({ onContinueShopping, onCheckout }) {
                                 >
                                     Remove
                                 </button>
-
                             </div>
-
                         ))}
 
-
                         <div className="cart-summary">
-
                             <h2>
-                                Total: 
-                                {Number(cartTotal).toFixed(2)}
+                                Total: {Number(cartTotal).toFixed(2)}
                             </h2>
 
-
                             <div className="cart-actions">
-
                                 <button
                                     type="button"
                                     onClick={onContinueShopping}
@@ -167,7 +126,6 @@ function CartPage({ onContinueShopping, onCheckout }) {
                                     Continue Shopping
                                 </button>
 
-
                                 <button
                                     type="button"
                                     onClick={onCheckout}
@@ -175,20 +133,13 @@ function CartPage({ onContinueShopping, onCheckout }) {
                                 >
                                     Checkout
                                 </button>
-
                             </div>
-
                         </div>
-
                     </>
-
                 )}
-
             </div>
-
         </div>
     );
 }
-
 
 export default CartPage;

@@ -6,7 +6,6 @@ The application allows users to register and log in, browse books, manage a shop
 
 This project was developed as a technical assignment with an emphasis on clean, maintainable code and a clear separation of responsibilities between the frontend and backend.
 
----
 
 ## Features
 
@@ -35,7 +34,6 @@ This project was developed as a technical assignment with an emphasis on clean, 
 - Create an order from the current cart
 - Clear the cart after successful checkout
 
----
 
 ## Architecture
 
@@ -67,7 +65,6 @@ The frontend is responsible for the user interface and client-side state.
 
 The backend handles business logic, validation, security, and data access.
 
----
 
 ## Project Structure
 
@@ -90,7 +87,6 @@ online-bookstore
     +-- service
 ```
 
----
 
 ## Technologies
 
@@ -111,8 +107,6 @@ online-bookstore
 ### Database
 
 - H2 In-Memory Database
-
----
 
 ## Running the Application
 
@@ -176,7 +170,6 @@ http://localhost:5173
 npm run lint
 npm run build
 ```
----
 
 ## API Endpoints
 
@@ -227,8 +220,6 @@ DELETE /cart/{bookId}
 POST /orders
 ```
 
----
-
 ## Validation and Error Handling
 
 Bean Validation is used for request validation, and exceptions are handled centrally using:
@@ -254,8 +245,6 @@ Passwords are hashed using `BCryptPasswordEncoder` and are never returned in API
 
 JWT-based authorization is outside the scope of this assignment.
 
----
-
 ## Testing
 
 ```
@@ -274,7 +263,6 @@ Unit tests cover the core business logic for authentication, cart operations, an
 - React Context used for authentication and cart state management
 - Centralized API communication using Axios
 
----
 
 ## Database
 
@@ -282,7 +270,6 @@ The application uses an H2 in-memory database, so no external database setup is 
 
 Data is reset when the application restarts.
 
----
 
 ## Code Quality, Separation of Concerns
 
@@ -328,8 +315,6 @@ SOLID principles are applied where appropriate without adding unnecessary abstra
 - Password hashing using BCrypt
 - Environment-based configuration for API URL and CORS settings
 
----
-
 ## Assumptions and Trade-offs
 
 This project was developed as a time-boxed technical assignment, with the focus on delivering the core bookstore workflow while keeping the implementation simple and maintainable.
@@ -345,5 +330,3 @@ This project was developed as a time-boxed technical assignment, with the focus 
 Passwords are hashed using BCrypt before being stored and are never stored in local storage.
 
 In a production application, cart and order data would be persisted, associated with authenticated users, and protected using a more complete authorization mechanism.
-
----

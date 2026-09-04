@@ -24,7 +24,6 @@ public class CartController {
             @Valid @RequestBody AddToCartRequest request) {
 
         log.info("Adding book to cart");
-
         return ResponseEntity.ok(cartService.addToCart(request));
     }
 
@@ -32,7 +31,6 @@ public class CartController {
     public ResponseEntity<CartResponse> getCart() {
 
         log.info("Fetching shopping cart");
-
         return ResponseEntity.ok(cartService.getCart());
     }
 
@@ -43,7 +41,6 @@ public class CartController {
             @Valid @RequestBody UpdateCartQuantityRequest request) {
 
         log.info("Updating cart item quantity");
-
         return ResponseEntity.ok(
                 cartService.updateQuantity(bookId, request.quantity())
         );
@@ -55,7 +52,6 @@ public class CartController {
             Long bookId) {
 
         log.info("Removing book from cart");
-
         return ResponseEntity.ok(cartService.removeFromCart(bookId));
     }
 }

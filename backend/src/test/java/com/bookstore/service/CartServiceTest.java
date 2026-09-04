@@ -65,7 +65,6 @@ class CartServiceTest {
                 .thenReturn(Optional.of(book));
 
         cartService.addToCart(new AddToCartRequest(1L, 1));
-
         CartResponse response = cartService.addToCart(
                 new AddToCartRequest(1L, 2)
         );
@@ -94,16 +93,13 @@ class CartServiceTest {
 
         when(bookRepository.findById(1L))
                 .thenReturn(Optional.of(cleanCode));
-
         when(bookRepository.findById(2L))
                 .thenReturn(Optional.of(effectiveJava));
-
         cartService.addToCart(new AddToCartRequest(1L, 2));
 
         CartResponse response = cartService.addToCart(
                 new AddToCartRequest(2L, 1)
         );
-
         assertEquals(2, response.items().size());
         assertEquals(BigDecimal.valueOf(1700), response.total());
     }
@@ -122,7 +118,6 @@ class CartServiceTest {
                 .thenReturn(Optional.of(book));
 
         cartService.addToCart(new AddToCartRequest(1L, 1));
-
         CartResponse response = cartService.updateQuantity(1L, 3);
 
         assertEquals(3, response.items().get(0).quantity());
@@ -143,7 +138,6 @@ class CartServiceTest {
                 .thenReturn(Optional.of(book));
 
         cartService.addToCart(new AddToCartRequest(1L, 1));
-
         CartResponse response = cartService.removeFromCart(1L);
 
         assertTrue(response.items().isEmpty());
@@ -180,7 +174,6 @@ class CartServiceTest {
             BigDecimal price) {
 
         Book book = new Book(title, author, price);
-
         ReflectionTestUtils.setField(book, "id", id);
 
         return book;

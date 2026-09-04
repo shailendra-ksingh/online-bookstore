@@ -58,7 +58,6 @@ class BookServiceTest {
     void getAllBooks_shouldReturnEmptyList() {
 
         when(bookRepository.findAll()).thenReturn(List.of());
-
         List<BookResponse> books = bookService.getAllBooks();
 
         assertNotNull(books);
@@ -76,13 +75,10 @@ class BookServiceTest {
         );
 
         ReflectionTestUtils.setField(book, "id", 1L);
-
         when(bookRepository.findAll()).thenReturn(List.of(book));
-
         List<BookResponse> books = bookService.getAllBooks();
 
         assertEquals(1, books.size());
-
         BookResponse response = books.get(0);
 
         assertEquals(1L, response.id());

@@ -20,9 +20,7 @@ public class OrderController {
     public ResponseEntity<OrderResponse> createOrder() {
 
         log.info("Order creation request received");
-
         OrderResponse response = orderService.createOrder();
-
         log.info("Order created successfully. OrderId={}", response.orderId());
 
         return ResponseEntity

@@ -1,9 +1,7 @@
 import { useState } from "react";
 import { useAuth } from "../context/useAuth";
 
-
 function LoginPage({ onLoginSuccess, onRegisterClick }) {
-
     const { login } = useAuth();
 
     const [email, setEmail] = useState("");
@@ -11,51 +9,38 @@ function LoginPage({ onLoginSuccess, onRegisterClick }) {
     const [error, setError] = useState("");
     const [loading, setLoading] = useState(false);
 
-
     const handleSubmit = async (event) => {
-
         event.preventDefault();
 
         setError("");
         setLoading(true);
 
         try {
-
             await login({
                 email: email.trim(),
                 password
             });
 
             onLoginSuccess();
-
         } catch (error) {
-
             const message =
                 error.response?.data?.message ||
                 "Unable to login. Please check your credentials.";
 
             setError(message);
-
         } finally {
-
             setLoading(false);
         }
     };
 
-
     return (
         <div className="auth-page">
-
             <div className="auth-container">
-
                 <div className="auth-card">
-
                     <h1>Login</h1>
 
                     <form onSubmit={handleSubmit}>
-
                         <div className="form-group">
-
                             <label htmlFor="email">
                                 Email
                             </label>
@@ -70,12 +55,9 @@ function LoginPage({ onLoginSuccess, onRegisterClick }) {
                                 autoComplete="email"
                                 required
                             />
-
                         </div>
 
-
                         <div className="form-group">
-
                             <label htmlFor="password">
                                 Password
                             </label>
@@ -90,9 +72,7 @@ function LoginPage({ onLoginSuccess, onRegisterClick }) {
                                 autoComplete="current-password"
                                 required
                             />
-
                         </div>
-
 
                         {error && (
                             <p
@@ -103,7 +83,6 @@ function LoginPage({ onLoginSuccess, onRegisterClick }) {
                             </p>
                         )}
 
-
                         <button
                             type="submit"
                             disabled={loading}
@@ -112,12 +91,9 @@ function LoginPage({ onLoginSuccess, onRegisterClick }) {
                                 ? "Logging in..."
                                 : "Login"}
                         </button>
-
                     </form>
 
-
                     <div className="auth-footer">
-
                         <p>Don't have an account?</p>
 
                         <button
@@ -128,16 +104,11 @@ function LoginPage({ onLoginSuccess, onRegisterClick }) {
                         >
                             Create Account
                         </button>
-
                     </div>
-
                 </div>
-
             </div>
-
         </div>
     );
 }
-
 
 export default LoginPage;

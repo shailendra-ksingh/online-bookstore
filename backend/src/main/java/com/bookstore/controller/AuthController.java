@@ -24,7 +24,6 @@ public class AuthController {
     @PostMapping("/register")
     public ResponseEntity<UserResponse> register(
             @Valid @RequestBody RegisterRequest request) {
-
         log.info("Registration request received");
 
         UserResponse response = authService.register(request);
@@ -37,7 +36,6 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<UserResponse> login(
             @Valid @RequestBody LoginRequest request) {
-
         log.info("Login request received");
 
         UserResponse response = authService.login(request);

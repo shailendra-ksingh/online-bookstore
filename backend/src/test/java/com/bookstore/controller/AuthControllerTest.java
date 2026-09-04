@@ -37,10 +37,8 @@ class AuthControllerTest {
                 "John Doe",
                 "john@example.com"
         );
-
         when(authService.register(any()))
                 .thenReturn(user);
-
         String request = """
                 {
                     "name": "John Doe",
@@ -69,7 +67,6 @@ class AuthControllerTest {
                     "password": "short"
                 }
                 """;
-
         mockMvc.perform(post("/api/v1/auth/register")
                         .contentType(APPLICATION_JSON)
                         .content(request))
@@ -88,14 +85,12 @@ class AuthControllerTest {
                         new org.springframework.security.authentication
                                 .BadCredentialsException("Invalid credentials")
                 );
-
         String request = """
                 {
                     "email": "john@example.com",
                     "password": "wrongPassword"
                 }
                 """;
-
         mockMvc.perform(post("/api/v1/auth/login")
                         .contentType(APPLICATION_JSON)
                         .content(request))

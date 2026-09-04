@@ -42,11 +42,8 @@ class OrderServiceTest {
                 List.of(cartItem),
                 new BigDecimal("1000.00")
         );
-
         when(cartService.getCart()).thenReturn(cart);
-
         OrderResponse order = orderService.createOrder();
-
         assertNotNull(order);
         assertEquals("CONFIRMED", order.status());
         assertEquals(new BigDecimal("1000.00"), order.total());
@@ -64,12 +61,10 @@ class OrderServiceTest {
         );
 
         when(cartService.getCart()).thenReturn(emptyCart);
-
         IllegalStateException exception = assertThrows(
                 IllegalStateException.class,
                 () -> orderService.createOrder()
         );
-
         assertEquals(
                 "Cannot create order because cart is empty",
                 exception.getMessage()
@@ -94,7 +89,6 @@ class OrderServiceTest {
         );
 
         when(cartService.getCart()).thenReturn(cart);
-
         OrderResponse firstOrder = orderService.createOrder();
         OrderResponse secondOrder = orderService.createOrder();
 

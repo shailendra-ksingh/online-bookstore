@@ -23,11 +23,8 @@ public class BookController {
     public ResponseEntity<List<BookResponse>> getBooks() {
 
         log.info("Fetching available books");
-
         List<BookResponse> books = bookService.getAllBooks();
-
         log.info("Retrieved {} books", books.size());
-
         return ResponseEntity.ok(books);
     }
 }

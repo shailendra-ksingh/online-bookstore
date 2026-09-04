@@ -67,12 +67,10 @@ class AuthServiceTest {
                 request.email(),
                 "encodedPassword"
         );
-
         when(userRepository.save(any(User.class)))
                 .thenReturn(user);
 
         UserResponse response = authService.register(request);
-
         assertNotNull(response);
         assertEquals("John Doe", response.name());
         assertEquals("john@example.com", response.email());
@@ -138,15 +136,12 @@ class AuthServiceTest {
                 "john@example.com",
                 "wrongPassword"
         );
-
         when(authenticationManager.authenticate(any()))
                 .thenThrow(new BadCredentialsException("Invalid credentials"));
-
         assertThrows(
                 BadCredentialsException.class,
                 () -> authService.login(loginRequest)
         );
-
         verify(userRepository, never()).findByEmail(anyString());
     }
 }

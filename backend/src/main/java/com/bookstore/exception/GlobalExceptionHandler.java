@@ -23,7 +23,6 @@ public class GlobalExceptionHandler {
     })
     public ResponseEntity<ErrorResponse> handleNotFoundException(
             RuntimeException exception) {
-
         log.warn("Resource not found: {}", exception.getMessage());
 
         return buildErrorResponse(
@@ -35,7 +34,6 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(UserAlreadyExistsException.class)
     public ResponseEntity<ErrorResponse> handleUserAlreadyExistsException(
             UserAlreadyExistsException exception) {
-
         log.warn("User already exists: {}", exception.getMessage());
 
         return buildErrorResponse(
@@ -47,7 +45,6 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(BadCredentialsException.class)
     public ResponseEntity<ErrorResponse> handleBadCredentialsException(
             BadCredentialsException exception) {
-
         log.warn("Invalid login attempt");
 
         return buildErrorResponse(
@@ -59,7 +56,6 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Map<String, String>> handleValidationException(
             MethodArgumentNotValidException exception) {
-
         log.warn("Request validation failed");
 
         Map<String, String> errors = exception.getBindingResult()
@@ -79,7 +75,6 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(IllegalStateException.class)
     public ResponseEntity<ErrorResponse> handleIllegalStateException(
             IllegalStateException exception) {
-
         log.warn("Invalid operation: {}", exception.getMessage());
 
         return buildErrorResponse(
@@ -92,7 +87,6 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleException(
             Exception exception) {
-
         log.error("Unexpected error", exception);
 
         return buildErrorResponse(
@@ -105,7 +99,6 @@ public class GlobalExceptionHandler {
     private ResponseEntity<ErrorResponse> buildErrorResponse(
             HttpStatus status,
             String message) {
-
         ErrorResponse response = new ErrorResponse(
                 LocalDateTime.now(),
                 status.value(),
