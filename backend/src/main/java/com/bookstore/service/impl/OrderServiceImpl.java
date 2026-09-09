@@ -9,6 +9,7 @@ import com.bookstore.repository.OrderRepository;
 import com.bookstore.service.CartService;
 import com.bookstore.service.OrderService;
 import lombok.RequiredArgsConstructor;
+import com.bookstore.entity.OrderStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -58,7 +59,7 @@ public class OrderServiceImpl implements OrderService {
         return new OrderResponse(
                 savedOrder.getId(),
                 savedOrder.getTotalAmount(),
-                "CONFIRMED"
+                OrderStatus.CONFIRMED
         );
     }
 }
