@@ -3,6 +3,7 @@ package com.bookstore.service;
 import com.bookstore.dto.book.BookResponse;
 import com.bookstore.entity.Book;
 import com.bookstore.repository.BookRepository;
+import com.bookstore.service.impl.BookServiceImpl;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -23,7 +24,7 @@ class BookServiceTest {
     private BookRepository bookRepository;
 
     @InjectMocks
-    private BookService bookService;
+    private BookServiceImpl bookService;
 
 
     @Test

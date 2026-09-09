@@ -24,20 +24,22 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotBlank(message = "Name is required")
-    @Column(nullable = false, length = 100)
+    @NotBlank
     private String name;
 
-    @NotBlank(message = "Email is required")
-    @Email(message = "Please provide a valid email address")
-    @Column(nullable = false, length = 255)
+    @NotBlank
+    @Email
     private String email;
 
     @JsonIgnore
     @Column(nullable = false)
     private String password;
 
-    public User(String name, String email, String password) {
+    public User(
+            String name,
+            String email,
+            String password) {
+
         this.name = name.trim();
         this.email = email.trim().toLowerCase();
         this.password = password;

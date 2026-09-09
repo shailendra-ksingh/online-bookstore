@@ -30,7 +30,7 @@ public class CustomUserDetailsService implements UserDetailsService {
 
         // Convert the application user entity into Spring Security's UserDetails model.
         return org.springframework.security.core.userdetails.User
-                .withUsername(user.getEmail())
+                .withUsername(user.getEmail()) // withUsername return UserBuilder
                 .password(user.getPassword())
                 .roles("USER")
                 .build();

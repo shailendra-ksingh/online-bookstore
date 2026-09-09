@@ -4,7 +4,7 @@ A full-stack Online Bookstore application built using React and Spring Boot.
 
 The application allows users to register and log in, browse books, manage a shopping cart, and place an order.
 
-This project was developed as a technical assignment with an emphasis on clean, maintainable code and a clear separation of responsibilities between the frontend and backend.
+This project was developed as a technical assignment. The main focus was to keep the application simple, easy to understand, and maintainable.
 
 ## Features
 
@@ -23,19 +23,23 @@ This project was developed as a technical assignment with an emphasis on clean, 
 
 ### Shopping Cart
 
-- Add, update, and remove items
+- Add books to the cart
+- Update item quantity
+- Remove items from the cart
 - Calculate cart totals
+- Cart items are stored in the database
 - Handle empty cart scenarios
 
 ### Checkout
 
 - Review order summary
 - Create an order from the current cart
+- Store order and order item details
 - Clear the cart after successful checkout
 
 ## Architecture
 
-The application is divided into separate frontend and backend applications.
+The frontend and backend are separate applications.
 
 ```text
                     React Frontend
@@ -57,11 +61,11 @@ The application is divided into separate frontend and backend applications.
                           |
                           v
                     H2 Database
-```
+````
 
-The frontend is responsible for the user interface and client-side state.
+The frontend handles the user interface and client-side state.
 
-The backend handles business logic, validation, security, and data access.
+The backend handles the business logic, validation, authentication, and database access.
 
 ## Project Structure
 
@@ -88,35 +92,35 @@ online-bookstore
 
 ### Frontend
 
-- React
-- JavaScript
-- Axios
+* React
+* JavaScript
+* Axios
 
 ### Backend
 
-- Java 17
-- Spring Boot
-- Spring Data JPA
-- Spring Security
-- Maven
+* Java 17
+* Spring Boot
+* Spring Data JPA
+* Spring Security
+* Maven
 
 ### Database
 
-- H2 In-Memory Database
+* H2 In-Memory Database
 
 ## Running the Application
 
 ### Prerequisites
 
-- Java 17
-- Maven
-- Node.js and npm
+* Java 17
+* Maven
+* Node.js and npm
 
 ### 1. Start the Backend
 
 Open a terminal and run:
 
-```
+```text
 cd online-bookstore\backend
 mvn spring-boot:run
 ```
@@ -129,7 +133,7 @@ http://localhost:8080
 
 To run backend tests:
 
-```
+```text
 mvn clean test
 ```
 
@@ -141,7 +145,7 @@ Open another terminal and run:
 cd online-bookstore\frontend
 ```
 
-Configure/verify a `.env` file with:
+Configure or check the `.env` file:
 
 ```text
 VITE_API_URL=http://localhost:8080/api/v1
@@ -177,7 +181,7 @@ http://localhost:8080/api/v1
 
 ## HTTP Status Codes
 
-The API uses appropriate HTTP status codes, including:
+The API uses standard HTTP status codes, including:
 
 ```text
 200 OK
@@ -218,105 +222,193 @@ POST /orders
 
 ## Validation and Error Handling
 
-Bean Validation is used for request validation, and exceptions are handled centrally using:
+Bean Validation is used for request validation.
 
-```java
+Exceptions are handled centrally using:
+
+```
 @RestControllerAdvice
 ```
 
-Common scenarios include:
+Some of the handled cases are:
 
-- Validation failures
-- Invalid login attempts
-- Missing books or cart items
-- Empty cart checkout
+* Invalid request data
+* Invalid login
+* Book not found
+* Cart item not found
+* Checkout with an empty cart
 
 ## Security
 
-Spring Security is configured for authentication-related flows.
+Spring Security is used for the login and authentication flow.
 
-Passwords are hashed using `BCryptPasswordEncoder` and are never returned in API responses.
+Passwords are hashed using `BCryptPasswordEncoder`.
+
+Passwords are not returned in API responses.
 
 JWT-based authorization is outside the scope of this assignment.
 
 ## Testing
 
-```
+Backend tests can be run using:
+
+```text
 mvn clean test
 ```
 
-Unit tests cover the core business logic for authentication, cart operations, and order creation.
+Unit tests cover the main business logic for:
+
+* User registration and login
+* Cart operations
+* Order creation
 
 ## Design Decisions
 
-- Layered architecture (Controller → Service → Repository)
-- DTOs used to separate API contracts from entities
-- Constructor-based dependency injection
-- React Context used for authentication and cart state management
-- Centralized API communication using Axios
+* Layered architecture: Controller → Service → Repository
+* DTOs are used for API requests and responses
+* Constructor-based dependency injection is used
+* React Context is used for authentication and cart state
+* Axios is used for backend API calls
+* Cart and order data are stored using JPA
 
 ## Database
 
-The application uses an H2 in-memory database, so no external database setup is required.
+The application uses an H2 in-memory database.
 
-Data is reset when the application restarts.
+No external database setup is required.
 
-## Code Quality and Separation of Concerns
+The database is recreated when the application starts, so the data is reset when the application restarts.
 
-The project follows common clean code and design practices to keep the application easy to understand and maintain.
+## Code Structure
 
-Frontend and backend responsibilities are clearly separated.
+The backend follows a simple layered structure.
 
-On the backend:
+### Controller
 
-- Controllers handle HTTP requests and responses.
-- Services contain the business logic.
-- Repositories handle database access.
-- DTOs are used for API request and response models.
-- Exception handling is centralized using `@RestControllerAdvice`.
+Controllers handle HTTP requests and responses.
 
-On the frontend:
+Examples:
 
-- Pages focus on UI and user interactions.
-- Context manages shared application state such as authentication and cart data.
-- API modules handle communication with backend endpoints.
-- Reusable components are kept separate from page-level logic.
+* `AuthController`
+* `BookController`
+* `CartController`
+* `OrderController`
 
-### SOLID Principles
+### Service
 
-SOLID principles are applied where appropriate without adding unnecessary abstractions.
+Services contain the main business logic.
 
-- Classes and components have focused responsibilities. For example, `CartService` handles cart operations, while `OrderService` handles order creation.
-- Dependencies are injected using constructor injection, keeping components loosely coupled and easier to test.
-- The layered structure makes it easier to add new features without heavily affecting unrelated parts of the application.
+Examples:
 
-### Good Practices
+* `AuthService`
+* `BookService`
+* `CartService`
+* `OrderService`
 
-- Meaningful and consistent naming
-- Small, focused methods
-- Constructor-based dependency injection
-- DTOs instead of exposing entities directly
-- Centralized exception handling
-- Request validation on the backend
-- Error handling on both frontend and backend
-- Reusable React components
-- React Context for shared state
-- API communication separated from UI components
-- Password hashing using BCrypt
-- Environment-based configuration for API URL and CORS settings
+### Repository
+
+Repositories handle database operations using Spring Data JPA.
+
+Examples include:
+
+* `BookRepository`
+* `UserRepository`
+* `CartRepository`
+* `CartItemRepository`
+* `OrderRepository`
+* `OrderItemRepository`
+
+### DTO
+
+DTOs are used for API request and response data instead of directly exposing entity objects.
+
+### Exception Handling
+
+Common application exceptions are handled in one place using `@RestControllerAdvice`.
+
+## Frontend Structure
+
+The frontend is split into pages, components, contexts, and API modules.
+
+### Pages
+
+The main pages are:
+
+* Login
+* Register
+* Books
+* Cart
+* Checkout
+
+### Context
+
+React Context is used for shared application state.
+
+`AuthContext` handles authentication state.
+
+`CartContext` handles cart items, cart total, and cart operations.
+
+### API
+
+Backend calls are kept in separate API files:
+
+* `authApi.js`
+* `bookApi.js`
+* `cartApi.js`
+* `orderApi.js`
+
+Axios configuration is kept in `apiClient.js`.
+
+This keeps API calls separate from the UI code.
 
 ## Assumptions and Trade-offs
 
-This project was developed as a time-boxed technical assignment, with the focus on delivering the core bookstore workflow while keeping the implementation simple and maintainable.
+This was a time-limited technical assignment, so some parts were kept simple.
 
-- The cart is stored in memory and is not associated with individual users.
-- Orders are created from the current cart but are not persisted.
-- Basic user authentication (registration and login) is implemented as part of the assignment scope.
-- JWT-based authorization or OAuth authentication is not included in the current scope.
-- Payment processing, admin functionality, search, filtering, and pagination are not included.
-- Transaction management is not implemented
-- H2 is used as an in-memory database, so data is reset when the application restarts.
+* The cart is stored in the database and contains multiple cart items.
+* A single default cart is used instead of creating a separate cart for each user.
+* Orders and order items are stored in the database.
+* Basic registration and login are implemented.
+* JWT or OAuth authentication is not included.
+* Payment processing is not included.
+* Admin functionality is not included.
+* Search, filtering, and pagination are not included.
+* H2 is used as an in-memory database, so data is reset when the application restarts.
+* Order creation is transactional. The order is saved and the cart is cleared as part of the checkout operation.
 
-Passwords are hashed using BCrypt before being stored and are never stored in local storage.
+The single default cart was chosen to keep the implementation within the scope of the assignment.
 
-In a production application, cart and order data would be persisted, associated with authenticated users, and protected using a more complete authorization mechanism.
+In a production application, carts and orders would normally be linked to individual users and a more complete authorization solution would be used.
+
+## Summary
+
+The application covers the main bookstore flow:
+
+```text
+Register
+   |
+   v
+Login
+   |
+   v
+Browse Books
+   |
+   v
+Add Books to Cart
+   |
+   v
+Update Cart
+   |
+   v
+Checkout
+   |
+   v
+Create Order
+   |
+   v
+Clear Cart
+```
+
+The project keeps the frontend and backend separate and uses Spring Boot REST APIs for communication between them.
+
+```
