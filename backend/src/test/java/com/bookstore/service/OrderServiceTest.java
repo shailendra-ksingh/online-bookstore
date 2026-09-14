@@ -3,7 +3,10 @@ package com.bookstore.service;
 import com.bookstore.dto.cart.CartItemResponse;
 import com.bookstore.dto.cart.CartResponse;
 import com.bookstore.dto.order.OrderResponse;
+import com.bookstore.entity.Book;
 import com.bookstore.entity.Order;
+import com.bookstore.entity.OrderStatus;
+import com.bookstore.repository.BookRepository;
 import com.bookstore.repository.OrderRepository;
 import com.bookstore.service.impl.OrderServiceImpl;
 import org.junit.jupiter.api.Test;
@@ -15,6 +18,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -28,6 +32,10 @@ class OrderServiceTest {
 
     @Mock
     private OrderRepository orderRepository;
+
+    @Mock
+    private BookRepository bookRepository;
+
 
     @InjectMocks
     private OrderServiceImpl orderService;
@@ -49,13 +57,22 @@ class OrderServiceTest {
         );
 
         when(cartService.getCart()).thenReturn(cartResponse);
+        Book book = new Book(
+                "Clean Code",
+                "Robert C. Martin",
+                new BigDecimal("500.00"),
+                10
+        );
+
+        when(bookRepository.findById(1L))
+                .thenReturn(Optional.of(book));
+        Order savedOrder = Order.builder()
+                .id(1L)
+                .totalAmount(new BigDecimal("1000.00"))
+                .build();
 
         when(orderRepository.save(any(Order.class)))
-                .thenAnswer(invocation -> {
-                    Order order = invocation.getArgument(0);
-                    order.setId(1L);
-                    return order;
-                });
+                .thenReturn(savedOrder);
 
         OrderResponse response = orderService.createOrder();
 
@@ -67,7 +84,7 @@ class OrderServiceTest {
                 response.total()
         );
 
-        assertEquals("CONFIRMED", response.status());
+        assertEquals(OrderStatus.CONFIRMED, response.status());
 
         verify(orderRepository).save(any(Order.class));
         verify(cartService).clearCart();
@@ -90,13 +107,22 @@ class OrderServiceTest {
         );
 
         when(cartService.getCart()).thenReturn(cartResponse);
+        Book book = new Book(
+                "Effective Java",
+                "Joshua Bloch",
+                new BigDecimal("750.00"),
+                10
+        );
+
+        when(bookRepository.findById(2L))
+                .thenReturn(Optional.of(book));
+        Order savedOrder = Order.builder()
+                .id(2L)
+                .totalAmount(new BigDecimal("1000.00"))
+                .build();
 
         when(orderRepository.save(any(Order.class)))
-                .thenAnswer(invocation -> {
-                    Order order = invocation.getArgument(0);
-                    order.setId(2L);
-                    return order;
-                });
+                .thenReturn(savedOrder);
 
         orderService.createOrder();
 
@@ -105,33 +131,33 @@ class OrderServiceTest {
 
         verify(orderRepository).save(captor.capture());
 
-        Order savedOrder = captor.getValue();
+        Order capturedOrder = captor.getValue();
 
         assertEquals(
                 new BigDecimal("2250.00"),
-                savedOrder.getTotalAmount()
+                capturedOrder.getTotalAmount()
         );
 
-        assertEquals(1, savedOrder.getItems().size());
+        assertEquals(1, capturedOrder.getItems().size());
 
         assertEquals(
                 2L,
-                savedOrder.getItems().get(0).getBookId()
+                capturedOrder.getItems().get(0).getBookId()
         );
 
         assertEquals(
                 "Effective Java",
-                savedOrder.getItems().get(0).getTitle()
+                capturedOrder.getItems().get(0).getTitle()
         );
 
         assertEquals(
                 3,
-                savedOrder.getItems().get(0).getQuantity()
+                capturedOrder.getItems().get(0).getQuantity()
         );
 
         assertEquals(
                 new BigDecimal("2250.00"),
-                savedOrder.getItems().get(0).getItemTotal()
+                capturedOrder.getItems().get(0).getItemTotal()
         );
 
         verify(cartService).clearCart();
@@ -161,4 +187,42 @@ class OrderServiceTest {
         verify(orderRepository, never()).save(any(Order.class));
         verify(cartService, never()).clearCart();
     }
+
+    @Test
+    void shouldNotCreateOrderWhenStockIsInsufficient() {
+
+        CartItemResponse item = new CartItemResponse(
+                1L,
+                "Clean Code",
+                new BigDecimal("500.00"),
+                5,
+                new BigDecimal("2500.00")
+        );
+
+        CartResponse cartResponse = new CartResponse(
+                List.of(item),
+                new BigDecimal("2500.00")
+        );
+
+        Book book = new Book(
+                "Clean Code",
+                "Robert C. Martin",
+                new BigDecimal("500.00"),
+                2
+        );
+
+        when(cartService.getCart()).thenReturn(cartResponse);
+
+        when(bookRepository.findById(1L))
+                .thenReturn(Optional.of(book));
+
+        assertThrows(
+                IllegalStateException.class,
+                () -> orderService.createOrder()
+        );
+
+        verify(orderRepository, never()).save(any(Order.class));
+        verify(cartService, never()).clearCart();
+    }
+
 }

@@ -95,6 +95,16 @@ public class GlobalExceptionHandler {
         );
     }
 
+    @ExceptionHandler(InsufficientStockException.class)
+    public ResponseEntity<ErrorResponse> handleInsufficientStock(
+            InsufficientStockException exception) {
+
+        return buildErrorResponse(
+                HttpStatus.BAD_REQUEST,
+                exception.getMessage()
+        );
+    }
+
     // Keeps the common error response creation in one place.
     private ResponseEntity<ErrorResponse> buildErrorResponse(
             HttpStatus status,

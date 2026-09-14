@@ -50,7 +50,8 @@ class CartServiceTest {
                 1L,
                 "Clean Code",
                 "Robert C. Martin",
-                BigDecimal.valueOf(500)
+                BigDecimal.valueOf(500),
+                10
         );
 
         Cart cart = createCart(1L);
@@ -96,7 +97,8 @@ class CartServiceTest {
                 1L,
                 "Clean Code",
                 "Robert C. Martin",
-                BigDecimal.valueOf(500)
+                BigDecimal.valueOf(500),
+                10
         );
 
         Cart cart = createCart(1L);
@@ -146,14 +148,16 @@ class CartServiceTest {
                 1L,
                 "Clean Code",
                 "Robert C. Martin",
-                BigDecimal.valueOf(500)
+                BigDecimal.valueOf(500),
+                10
         );
 
         Book effectiveJava = createBook(
                 2L,
                 "Effective Java",
                 "Joshua Bloch",
-                BigDecimal.valueOf(700)
+                BigDecimal.valueOf(700),
+                10
         );
 
         Cart cart = createCart(1L);
@@ -221,7 +225,8 @@ class CartServiceTest {
                 1L,
                 "Clean Code",
                 "Robert C. Martin",
-                BigDecimal.valueOf(500)
+                BigDecimal.valueOf(500) ,
+                10
         );
 
         Cart cart = createCart(1L);
@@ -265,7 +270,8 @@ class CartServiceTest {
                 1L,
                 "Effective Java",
                 "Joshua Bloch",
-                BigDecimal.valueOf(700)
+                BigDecimal.valueOf(700) ,
+                10
         );
 
         Cart cart = createCart(1L);
@@ -346,12 +352,14 @@ class CartServiceTest {
             Long id,
             String title,
             String author,
-            BigDecimal price) {
+            BigDecimal price,
+            Integer stock) {
 
         Book book = new Book(
                 title,
                 author,
-                price
+                price,
+                stock
         );
 
         ReflectionTestUtils.setField(
