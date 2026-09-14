@@ -40,7 +40,7 @@ public class OrderServiceImpl implements OrderService {
                     .orElseThrow(() ->
                             new BookNotFoundException(cartItem.bookId()));
 
-            if (book.getStock() < cartItem.quantity()) {
+            if (!book.hasEnoughStock(cartItem.quantity())) {
                 throw new InsufficientStockException(
                         book.getTitle(),
                         book.getStock()

@@ -1,5 +1,6 @@
 package com.bookstore.entity;
 
+import com.bookstore.exception.InsufficientStockException;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotBlank;
@@ -59,8 +60,9 @@ public class Book {
         }
 
         if (quantity > stock) {
-            throw new IllegalStateException(
-                    "Insufficient stock for book: " + title
+            throw new InsufficientStockException(
+                    title,
+                    stock
             );
         }
 

@@ -6,6 +6,7 @@ import com.bookstore.dto.order.OrderResponse;
 import com.bookstore.entity.Book;
 import com.bookstore.entity.Order;
 import com.bookstore.entity.OrderStatus;
+import com.bookstore.exception.InsufficientStockException;
 import com.bookstore.repository.BookRepository;
 import com.bookstore.repository.OrderRepository;
 import com.bookstore.service.impl.OrderServiceImpl;
@@ -69,6 +70,7 @@ class OrderServiceTest {
         Order savedOrder = Order.builder()
                 .id(1L)
                 .totalAmount(new BigDecimal("1000.00"))
+                .status(OrderStatus.CONFIRMED)
                 .build();
 
         when(orderRepository.save(any(Order.class)))
@@ -217,7 +219,7 @@ class OrderServiceTest {
                 .thenReturn(Optional.of(book));
 
         assertThrows(
-                IllegalStateException.class,
+                InsufficientStockException.class,
                 () -> orderService.createOrder()
         );
 
