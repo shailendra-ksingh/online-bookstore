@@ -3,6 +3,7 @@ package com.bookstore.service;
 import com.bookstore.dto.cart.CartItemResponse;
 import com.bookstore.dto.cart.CartResponse;
 import com.bookstore.dto.order.OrderResponse;
+import com.bookstore.dto.payment.PaymentResult;
 import com.bookstore.entity.Book;
 import com.bookstore.entity.Order;
 import com.bookstore.entity.OrderStatus;
@@ -41,6 +42,9 @@ class OrderServiceTest {
     @InjectMocks
     private OrderServiceImpl orderService;
 
+    @Mock
+    private PaymentService paymentService;
+
     @Test
     void shouldCreateOrderFromCart() {
 
@@ -75,6 +79,15 @@ class OrderServiceTest {
 
         when(orderRepository.save(any(Order.class)))
                 .thenReturn(savedOrder);
+
+        when(paymentService.processPayment(any(BigDecimal.class)))
+                .thenReturn(
+                        new PaymentResult(
+                                true,
+                                "TEST-TXN-001",
+                                "Payment successful"
+                        )
+                );
 
         OrderResponse response = orderService.createOrder();
 
@@ -125,6 +138,15 @@ class OrderServiceTest {
 
         when(orderRepository.save(any(Order.class)))
                 .thenReturn(savedOrder);
+
+        when(paymentService.processPayment(any(BigDecimal.class)))
+                .thenReturn(
+                        new PaymentResult(
+                                true,
+                                "TEST-TXN-001",
+                                "Payment successful"
+                        )
+                );
 
         orderService.createOrder();
 
