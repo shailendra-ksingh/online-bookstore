@@ -1,5 +1,6 @@
 package com.bookstore.service.impl;
 
+import com.bookstore.dto.payment.PaymentResult;
 import com.bookstore.dto.cart.CartItemResponse;
 import com.bookstore.dto.cart.CartResponse;
 import com.bookstore.dto.order.OrderResponse;
@@ -11,6 +12,7 @@ import com.bookstore.repository.BookRepository;
 import com.bookstore.repository.OrderRepository;
 import com.bookstore.service.CartService;
 import com.bookstore.service.OrderService;
+import com.bookstore.service.PaymentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,6 +24,7 @@ public class OrderServiceImpl implements OrderService {
     private final CartService cartService;
     private final OrderRepository orderRepository;
     private final BookRepository bookRepository;
+    private final PaymentService paymentService;
     @Override
     @Transactional
     public OrderResponse createOrder() {
@@ -63,6 +66,11 @@ public class OrderServiceImpl implements OrderService {
 
         cartService.clearCart();
 
+        PaymentResult paymentResult =
+                paymentService.processPayment(cart.total());
+        if (!paymentResult.successful()) {
+            throw new IllegalStateException("Payment failed");
+        }
         return new OrderResponse(
                 savedOrder.getId(),
                 savedOrder.getTotalAmount(),
