@@ -5,7 +5,9 @@ import com.bookstore.dto.payment.PaymentResult;
 
 import java.math.BigDecimal;
 
-public interface PaymentService {
+public interface PaymentStrategy {
 
-    PaymentResult processPayment(BigDecimal amount, PaymentMethod paymentMethod);
+    PaymentMethod getPaymentMethod();
+
+    PaymentResult process(BigDecimal amount);
 }

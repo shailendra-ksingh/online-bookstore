@@ -1,5 +1,6 @@
 package com.bookstore.service.impl;
 
+import com.bookstore.dto.payment.PaymentMethod;
 import com.bookstore.dto.payment.PaymentResult;
 import com.bookstore.dto.cart.CartItemResponse;
 import com.bookstore.dto.cart.CartResponse;
@@ -14,9 +15,14 @@ import com.bookstore.service.CartService;
 import com.bookstore.service.OrderService;
 import com.bookstore.service.PaymentService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashMap;
+import java.util.Map;
+
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class OrderServiceImpl implements OrderService {
@@ -25,6 +31,7 @@ public class OrderServiceImpl implements OrderService {
     private final OrderRepository orderRepository;
     private final BookRepository bookRepository;
     private final PaymentService paymentService;
+
     @Override
     @Transactional
     public OrderResponse createOrder() {
@@ -32,45 +39,84 @@ public class OrderServiceImpl implements OrderService {
         CartResponse cart = cartService.getCart();
 
         if (cart.items().isEmpty()) {
+            log.warn("Checkout requested with an empty cart");
+
             throw new IllegalStateException(
                     "Cannot create order because cart is empty"
             );
         }
 
-        for (CartItemResponse cartItem : cart.items()) {
+        log.info(
+                "Starting checkout for {} item(s)",
+                cart.items().size()
+        );
 
-            Book book = bookRepository.findById(cartItem.bookId())
+        Map<Long, Book> books = new HashMap<>();
+
+        // 1. Validate stock for all items
+        for (CartItemResponse item : cart.items()) {
+
+            Book book = bookRepository.findById(item.bookId())
                     .orElseThrow(() ->
-                            new BookNotFoundException(cartItem.bookId()));
+                            new BookNotFoundException(item.bookId()));
 
-            if (!book.hasEnoughStock(cartItem.quantity())) {
+            if (!book.hasEnoughStock(item.quantity())) {
+
+                log.warn(
+                        "Insufficient stock for book {}, requested={}, available={}",
+                        item.bookId(),
+                        item.quantity(),
+                        book.getStock()
+                );
+
                 throw new InsufficientStockException(
                         book.getTitle(),
                         book.getStock()
                 );
             }
+
+            books.put(book.getId(), book);
         }
 
-        for (CartItemResponse cartItem : cart.items()) {
+        // 2. Process payment
+        PaymentResult paymentResult =
+                paymentService.processPayment(
+                        cart.total(),
+                        PaymentMethod.CARD
+                );
 
-            Book book = bookRepository.findById(cartItem.bookId())
-                    .orElseThrow(() ->
-                            new BookNotFoundException(cartItem.bookId()));
+        if (!paymentResult.successful()) {
 
-            book.reduceStock(cartItem.quantity());
+            log.warn("Payment failed during checkout");
+
+            throw new IllegalStateException(
+                    "Payment failed"
+            );
         }
 
+        // 3. Create order
+//        Order order = Order.fromCart(cart);
         Order order = OrderFactory.createOrder(cart);
 
-        Order savedOrder = orderRepository.save(order);
+        // 4. Reduce stock
+        for (CartItemResponse item : cart.items()) {
+            books.get(item.bookId())
+                    .reduceStock(item.quantity());
+        }
 
+        // 5. Save order
+        Order savedOrder =
+                orderRepository.save(order);
+
+        // 6. Clear cart
         cartService.clearCart();
 
-        PaymentResult paymentResult =
-                paymentService.processPayment(cart.total());
-        if (!paymentResult.successful()) {
-            throw new IllegalStateException("Payment failed");
-        }
+        log.info(
+                "Checkout completed successfully. orderId={}, amount={}",
+                savedOrder.getId(),
+                savedOrder.getTotalAmount()
+        );
+
         return new OrderResponse(
                 savedOrder.getId(),
                 savedOrder.getTotalAmount(),

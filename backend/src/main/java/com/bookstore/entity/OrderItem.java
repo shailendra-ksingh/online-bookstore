@@ -8,9 +8,8 @@ import java.math.BigDecimal;
 @Entity
 @Table(name = "order_items")
 @Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor(access = AccessLevel.PROTECTED)
 @Builder
 public class OrderItem {
 
@@ -36,4 +35,8 @@ public class OrderItem {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "order_id", nullable = false)
     private Order order;
+
+    void setOrder(Order order) {
+        this.order = order;
+    }
 }

@@ -9,9 +9,8 @@ import java.util.List;
 @Entity
 @Table(name = "carts")
 @Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor(access = AccessLevel.PROTECTED)
 @Builder
 public class Cart {
 

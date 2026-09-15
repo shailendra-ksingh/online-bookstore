@@ -1,5 +1,7 @@
 package com.bookstore.entity;
 
+import com.bookstore.dto.cart.CartItemResponse;
+import com.bookstore.dto.cart.CartResponse;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -37,6 +39,30 @@ public class Order {
     )
     @Builder.Default
     private List<OrderItem> items = new ArrayList<>();
+
+    public static Order fromCart(CartResponse cart) {
+
+        Order order = Order.builder()
+                .createdAt(LocalDateTime.now())
+                .totalAmount(cart.total())
+                .status(OrderStatus.CONFIRMED)
+                .build();
+
+        for (CartItemResponse item : cart.items()) {
+
+            OrderItem orderItem = OrderItem.builder()
+                    .bookId(item.bookId())
+                    .title(item.title())
+                    .price(item.price())
+                    .quantity(item.quantity())
+                    .itemTotal(item.itemTotal())
+                    .build();
+
+            order.addItem(orderItem);
+        }
+
+        return order;
+    }
 
     public void addItem(OrderItem item) {
         items.add(item);

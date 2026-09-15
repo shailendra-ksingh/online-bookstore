@@ -13,11 +13,13 @@ import com.bookstore.repository.CartItemRepository;
 import com.bookstore.repository.CartRepository;
 import com.bookstore.service.CartService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.util.List;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class CartServiceImpl implements CartService {
@@ -33,7 +35,8 @@ public class CartServiceImpl implements CartService {
                     "Quantity must be greater than zero"
             );
         }
-
+        log.info("Adding book {} to cart, quantity={}",
+                request.bookId(), request.quantity());
         Book book = findBook(request.bookId());
         Cart cart = getOrCreateCart();
 
@@ -50,9 +53,7 @@ public class CartServiceImpl implements CartService {
                                 .build()
                 );
 
-        cartItem.setQuantity(
-                cartItem.getQuantity() + request.quantity()
-        );
+        cartItem.increaseQuantity(request.quantity());
 
         cartItemRepository.save(cartItem);
 
@@ -86,8 +87,9 @@ public class CartServiceImpl implements CartService {
         if (quantity <= 0) {
             return removeFromCart(bookId);
         }
-
-        cartItem.setQuantity(quantity);
+        log.info("Updating cart item {}, quantity={}",
+                bookId, quantity);
+        cartItem.updateQuantity(quantity);
 
         cartItemRepository.save(cartItem);
 
@@ -97,7 +99,7 @@ public class CartServiceImpl implements CartService {
     @Override
     public CartResponse removeFromCart(Long bookId) {
         CartItem cartItem = findCartItem(bookId);
-
+        log.info("Removing book {} from cart", bookId);
         cartItemRepository.delete(cartItem);
 
         return getCart();
@@ -107,6 +109,7 @@ public class CartServiceImpl implements CartService {
     public void clearCart() {
         Cart cart = getOrCreateCart();
 
+        log.info("Clearing cart {}", cart.getId());
         cartItemRepository.deleteByCartId(cart.getId());
     }
 

@@ -11,9 +11,8 @@ import lombok.*;
         )
 )
 @Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor(access = AccessLevel.PROTECTED)
 @Builder
 public class CartItem {
 
@@ -31,4 +30,24 @@ public class CartItem {
 
     @Column(nullable = false)
     private Integer quantity;
+
+    public void increaseQuantity(int amount) {
+        if (amount <= 0) {
+            throw new IllegalArgumentException(
+                    "Quantity must be greater than zero"
+            );
+        }
+
+        quantity += amount;
+    }
+
+    public void updateQuantity(int quantity) {
+        if (quantity <= 0) {
+            throw new IllegalArgumentException(
+                    "Quantity must be greater than zero"
+            );
+        }
+
+        this.quantity = quantity;
+    }
 }

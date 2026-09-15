@@ -16,7 +16,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.test.util.ReflectionTestUtils;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -225,7 +224,7 @@ class CartServiceTest {
                 1L,
                 "Clean Code",
                 "Robert C. Martin",
-                BigDecimal.valueOf(500) ,
+                BigDecimal.valueOf(500),
                 10
         );
 
@@ -255,7 +254,10 @@ class CartServiceTest {
                 3
         );
 
-        assertEquals(3, response.items().get(0).quantity());
+        assertEquals(
+                3,
+                response.items().get(0).quantity()
+        );
 
         assertEquals(
                 0,
@@ -270,7 +272,7 @@ class CartServiceTest {
                 1L,
                 "Effective Java",
                 "Joshua Bloch",
-                BigDecimal.valueOf(700) ,
+                BigDecimal.valueOf(700),
                 10
         );
 
@@ -336,16 +338,9 @@ class CartServiceTest {
     }
 
     private Cart createCart(Long id) {
-
-        Cart cart = new Cart();
-
-        ReflectionTestUtils.setField(
-                cart,
-                "id",
-                id
-        );
-
-        return cart;
+        return Cart.builder()
+                .id(id)
+                .build();
     }
 
     private Book createBook(
@@ -362,11 +357,16 @@ class CartServiceTest {
                 stock
         );
 
-        ReflectionTestUtils.setField(
-                book,
-                "id",
-                id
-        );
+        try {
+            var field = Book.class.getDeclaredField("id");
+            field.setAccessible(true);
+            field.set(book, id);
+        } catch (ReflectiveOperationException exception) {
+            throw new IllegalStateException(
+                    "Unable to set book id for test",
+                    exception
+            );
+        }
 
         return book;
     }
@@ -377,32 +377,11 @@ class CartServiceTest {
             Book book,
             Integer quantity) {
 
-        CartItem cartItem = new CartItem();
-
-        ReflectionTestUtils.setField(
-                cartItem,
-                "id",
-                id
-        );
-
-        ReflectionTestUtils.setField(
-                cartItem,
-                "cart",
-                cart
-        );
-
-        ReflectionTestUtils.setField(
-                cartItem,
-                "book",
-                book
-        );
-
-        ReflectionTestUtils.setField(
-                cartItem,
-                "quantity",
-                quantity
-        );
-
-        return cartItem;
+        return CartItem.builder()
+                .id(id)
+                .cart(cart)
+                .book(book)
+                .quantity(quantity)
+                .build();
     }
 }
