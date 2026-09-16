@@ -3,19 +3,31 @@ package com.bookstore.service;
 import com.bookstore.dto.cart.CartItemResponse;
 import com.bookstore.dto.cart.CartResponse;
 import com.bookstore.dto.order.OrderResponse;
+import com.bookstore.dto.payment.PaymentMethod;
+import com.bookstore.dto.payment.PaymentResult;
+import com.bookstore.entity.Book;
+import com.bookstore.entity.Order;
+import com.bookstore.entity.OrderStatus;
+import com.bookstore.exception.InsufficientStockException;
+import com.bookstore.repository.BookRepository;
+import com.bookstore.repository.OrderRepository;
+import com.bookstore.service.impl.OrderServiceImpl;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import java.math.BigDecimal;
-import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class OrderServiceTest {
@@ -23,14 +35,22 @@ class OrderServiceTest {
     @Mock
     private CartService cartService;
 
-    @InjectMocks
-    private OrderService orderService;
+    @Mock
+    private OrderRepository orderRepository;
 
+    @Mock
+    private BookRepository bookRepository;
+
+    @Mock
+    private PaymentService paymentService;
+
+    @InjectMocks
+    private OrderServiceImpl orderService;
 
     @Test
-    void shouldCreateOrderSuccessfully() {
+    void shouldCreateOrderFromCart() {
 
-        CartItemResponse cartItem = new CartItemResponse(
+        CartItemResponse item = new CartItemResponse(
                 1L,
                 "Clean Code",
                 new BigDecimal("500.00"),
@@ -38,63 +58,329 @@ class OrderServiceTest {
                 new BigDecimal("1000.00")
         );
 
-        CartResponse cart = new CartResponse(
-                List.of(cartItem),
+        CartResponse cartResponse = new CartResponse(
+                List.of(item),
                 new BigDecimal("1000.00")
         );
-        when(cartService.getCart()).thenReturn(cart);
-        OrderResponse order = orderService.createOrder();
-        assertNotNull(order);
-        assertEquals("CONFIRMED", order.status());
-        assertEquals(new BigDecimal("1000.00"), order.total());
 
-        verify(cartService).clearCart();
+        when(cartService.getCart())
+                .thenReturn(cartResponse);
+
+        Book book = createBook(
+                1L,
+                "Clean Code",
+                "Robert C. Martin",
+                new BigDecimal("500.00"),
+                10
+        );
+
+        when(bookRepository.findById(1L))
+                .thenReturn(Optional.of(book));
+
+        Order savedOrder = Order.builder()
+                .id(1L)
+                .totalAmount(new BigDecimal("1000.00"))
+                .status(OrderStatus.CONFIRMED)
+                .build();
+
+        when(orderRepository.save(any(Order.class)))
+                .thenReturn(savedOrder);
+
+        when(paymentService.processPayment(
+                any(BigDecimal.class),
+                eq(PaymentMethod.CARD)
+        )).thenReturn(
+                new PaymentResult(
+                        true,
+                        "TEST-TXN-001",
+                        "Payment successful"
+                )
+        );
+
+        OrderResponse response = orderService.createOrder();
+
+        assertNotNull(response);
+
+        assertEquals(
+                1L,
+                response.orderId()
+        );
+
+        assertEquals(
+                new BigDecimal("1000.00"),
+                response.total()
+        );
+
+        assertEquals(
+                OrderStatus.CONFIRMED,
+                response.status()
+        );
+
+        verify(orderRepository)
+                .save(any(Order.class));
+
+        verify(cartService)
+                .clearCart();
     }
 
+    @Test
+    void shouldCreateOrderWithCorrectItems() {
+
+        CartItemResponse item = new CartItemResponse(
+                2L,
+                "Effective Java",
+                new BigDecimal("750.00"),
+                3,
+                new BigDecimal("2250.00")
+        );
+
+        CartResponse cartResponse = new CartResponse(
+                List.of(item),
+                new BigDecimal("2250.00")
+        );
+
+        when(cartService.getCart())
+                .thenReturn(cartResponse);
+
+        Book book = createBook(
+                2L,
+                "Effective Java",
+                "Joshua Bloch",
+                new BigDecimal("750.00"),
+                10
+        );
+
+        when(bookRepository.findById(2L))
+                .thenReturn(Optional.of(book));
+
+        Order savedOrder = Order.builder()
+                .id(2L)
+                .totalAmount(new BigDecimal("2250.00"))
+                .status(OrderStatus.CONFIRMED)
+                .build();
+
+        when(orderRepository.save(any(Order.class)))
+                .thenReturn(savedOrder);
+
+        when(paymentService.processPayment(
+                any(BigDecimal.class),
+                eq(PaymentMethod.CARD)
+        )).thenReturn(
+                new PaymentResult(
+                        true,
+                        "TEST-TXN-001",
+                        "Payment successful"
+                )
+        );
+
+        orderService.createOrder();
+
+        ArgumentCaptor<Order> captor =
+                ArgumentCaptor.forClass(Order.class);
+
+        verify(orderRepository)
+                .save(captor.capture());
+
+        Order capturedOrder = captor.getValue();
+
+        assertEquals(
+                new BigDecimal("2250.00"),
+                capturedOrder.getTotalAmount()
+        );
+
+        assertEquals(
+                1,
+                capturedOrder.getItems().size()
+        );
+
+        assertEquals(
+                2L,
+                capturedOrder.getItems()
+                        .get(0)
+                        .getBookId()
+        );
+
+        assertEquals(
+                "Effective Java",
+                capturedOrder.getItems()
+                        .get(0)
+                        .getTitle()
+        );
+
+        assertEquals(
+                3,
+                capturedOrder.getItems()
+                        .get(0)
+                        .getQuantity()
+        );
+
+        assertEquals(
+                new BigDecimal("2250.00"),
+                capturedOrder.getItems()
+                        .get(0)
+                        .getItemTotal()
+        );
+
+        verify(cartService)
+                .clearCart();
+    }
 
     @Test
-    void shouldNotCreateOrderForEmptyCart() {
+    void shouldNotCreateOrderWhenCartIsEmpty() {
 
         CartResponse emptyCart = new CartResponse(
-                Collections.emptyList(),
+                List.of(),
                 BigDecimal.ZERO
         );
 
-        when(cartService.getCart()).thenReturn(emptyCart);
-        IllegalStateException exception = assertThrows(
-                IllegalStateException.class,
-                () -> orderService.createOrder()
-        );
+        when(cartService.getCart())
+                .thenReturn(emptyCart);
+
+        IllegalStateException exception =
+                assertThrows(
+                        IllegalStateException.class,
+                        () -> orderService.createOrder()
+                );
+
         assertEquals(
                 "Cannot create order because cart is empty",
                 exception.getMessage()
         );
+
+        verify(orderRepository, never())
+                .save(any(Order.class));
+
+        verify(cartService, never())
+                .clearCart();
+
+        verify(paymentService, never())
+                .processPayment(
+                        any(BigDecimal.class),
+                        any(PaymentMethod.class)
+                );
     }
 
+    @Test
+    void shouldNotCreateOrderWhenStockIsInsufficient() {
+
+        CartItemResponse item = new CartItemResponse(
+                1L,
+                "Clean Code",
+                new BigDecimal("500.00"),
+                5,
+                new BigDecimal("2500.00")
+        );
+
+        CartResponse cartResponse = new CartResponse(
+                List.of(item),
+                new BigDecimal("2500.00")
+        );
+
+        Book book = createBook(
+                1L,
+                "Clean Code",
+                "Robert C. Martin",
+                new BigDecimal("500.00"),
+                2
+        );
+
+        when(cartService.getCart())
+                .thenReturn(cartResponse);
+
+        when(bookRepository.findById(1L))
+                .thenReturn(Optional.of(book));
+
+        assertThrows(
+                InsufficientStockException.class,
+                () -> orderService.createOrder()
+        );
+
+        verify(orderRepository, never())
+                .save(any(Order.class));
+
+        verify(cartService, never())
+                .clearCart();
+
+        verify(paymentService, never())
+                .processPayment(
+                        any(BigDecimal.class),
+                        any(PaymentMethod.class)
+                );
+    }
 
     @Test
-    void shouldGenerateDifferentOrderIds() {
+    void shouldNotCreateOrderWhenPaymentFails() {
 
-        CartItemResponse cartItem = new CartItemResponse(
+        CartItemResponse item = new CartItemResponse(
                 1L,
-                "Spring Boot In Action",
-                new BigDecimal("700.00"),
+                "Clean Code",
+                new BigDecimal("500.00"),
                 1,
-                new BigDecimal("700.00")
+                new BigDecimal("500.00")
         );
 
-        CartResponse cart = new CartResponse(
-                List.of(cartItem),
-                new BigDecimal("700.00")
+        CartResponse cartResponse = new CartResponse(
+                List.of(item),
+                new BigDecimal("500.00")
         );
 
-        when(cartService.getCart()).thenReturn(cart);
-        OrderResponse firstOrder = orderService.createOrder();
-        OrderResponse secondOrder = orderService.createOrder();
+        when(cartService.getCart())
+                .thenReturn(cartResponse);
 
-        assertNotEquals(
-                firstOrder.orderId(),
-                secondOrder.orderId()
+        Book book = createBook(
+                1L,
+                "Clean Code",
+                "Robert C. Martin",
+                new BigDecimal("500.00"),
+                10
         );
+
+        when(bookRepository.findById(1L))
+                .thenReturn(Optional.of(book));
+
+        when(paymentService.processPayment(
+                any(BigDecimal.class),
+                eq(PaymentMethod.CARD)
+        )).thenReturn(
+                new PaymentResult(
+                        false,
+                        null,
+                        "Payment failed"
+                )
+        );
+
+        assertThrows(
+                IllegalStateException.class,
+                () -> orderService.createOrder()
+        );
+
+        verify(orderRepository, never())
+                .save(any(Order.class));
+
+        verify(cartService, never())
+                .clearCart();
+    }
+
+    private Book createBook(
+            Long id,
+            String title,
+            String author,
+            BigDecimal price,
+            Integer stock) {
+
+        Book book = new Book(
+                title,
+                author,
+                price,
+                stock
+        );
+
+        ReflectionTestUtils.setField(
+                book,
+                "id",
+                id
+        );
+
+        return book;
     }
 }

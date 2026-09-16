@@ -22,15 +22,13 @@ public class CustomUserDetailsService implements UserDetailsService {
 
         log.debug("Loading user by email: {}", email);
 
-        // Spring Security uses this service to load user details during authentication.
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() ->
                         new UsernameNotFoundException(
                                 "User not found with email: " + email));
 
-        // Convert the application user entity into Spring Security's UserDetails model.
         return org.springframework.security.core.userdetails.User
-                .withUsername(user.getEmail())
+                .withUsername(user.getEmail()) // withUsername return UserBuilder
                 .password(user.getPassword())
                 .roles("USER")
                 .build();

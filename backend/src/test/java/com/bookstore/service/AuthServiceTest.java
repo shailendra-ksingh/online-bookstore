@@ -6,6 +6,7 @@ import com.bookstore.dto.auth.UserResponse;
 import com.bookstore.entity.User;
 import com.bookstore.exception.UserAlreadyExistsException;
 import com.bookstore.repository.UserRepository;
+import com.bookstore.service.impl.AuthServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -39,7 +40,7 @@ class AuthServiceTest {
     private AuthenticationManager authenticationManager;
 
     @InjectMocks
-    private AuthService authService;
+    private AuthServiceImpl authService;
 
     private RegisterRequest request;
 

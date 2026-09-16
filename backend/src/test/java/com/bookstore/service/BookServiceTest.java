@@ -3,6 +3,7 @@ package com.bookstore.service;
 import com.bookstore.dto.book.BookResponse;
 import com.bookstore.entity.Book;
 import com.bookstore.repository.BookRepository;
+import com.bookstore.service.impl.BookServiceImpl;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -23,7 +24,7 @@ class BookServiceTest {
     private BookRepository bookRepository;
 
     @InjectMocks
-    private BookService bookService;
+    private BookServiceImpl bookService;
 
 
     @Test
@@ -32,13 +33,15 @@ class BookServiceTest {
         Book book1 = new Book(
                 "Clean Code",
                 "Robert C. Martin",
-                BigDecimal.valueOf(500)
+                BigDecimal.valueOf(500),
+                10
         );
 
         Book book2 = new Book(
                 "Effective Java",
                 "Joshua Bloch",
-                BigDecimal.valueOf(700)
+                BigDecimal.valueOf(700),
+                10
         );
 
         when(bookRepository.findAll())
@@ -71,7 +74,8 @@ class BookServiceTest {
         Book book = new Book(
                 "Clean Architecture",
                 "Robert C. Martin",
-                BigDecimal.valueOf(650)
+                BigDecimal.valueOf(650) ,
+                10
         );
 
         ReflectionTestUtils.setField(book, "id", 1L);

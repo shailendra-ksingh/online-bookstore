@@ -95,6 +95,21 @@ public class GlobalExceptionHandler {
         );
     }
 
+    @ExceptionHandler(InsufficientStockException.class)
+    public ResponseEntity<ErrorResponse> handleInsufficientStock(
+            InsufficientStockException exception) {
+
+        log.warn(
+                "Checkout rejected due to insufficient stock: {}",
+                exception.getMessage()
+        );
+
+        return buildErrorResponse(
+                HttpStatus.CONFLICT,
+                exception.getMessage()
+        );
+    }
+
     // Keeps the common error response creation in one place.
     private ResponseEntity<ErrorResponse> buildErrorResponse(
             HttpStatus status,
